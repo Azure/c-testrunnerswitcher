@@ -7,7 +7,7 @@ set build-root=%~dp0..
 rem // resolve to fully qualified path
 for %%i in ("%build-root%") do set build-root=%%~fi
 
-rmdir /s %build-root%\cmake
+rmdir /s /q %build-root%\cmake
 mkdir %build-root%\cmake
 if errorlevel 1 goto :eof
 

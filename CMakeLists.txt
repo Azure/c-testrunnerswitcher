@@ -4,6 +4,12 @@
 #this is CMakeLists for testrunerswitcher. It only defines a global include 
 cmake_minimum_required(VERSION 2.8.11)
 
+if (DEFINED AZURE_C_TESTRUNNERSWITCHER_BUILT)
+    RETURN()
+else()
+    SET(AZURE_C_TESTRUNNERSWITCHER_BUILT ON)
+endif()
+
 project(testrunnerswitcher)
 
 include (CTest)

@@ -4,9 +4,17 @@
 #this is CMakeLists for testrunerswitcher. It only defines a global include 
 cmake_minimum_required(VERSION 2.8.11)
 
-project(azure_c_testrunnerswitcher)
+project(testrunnerswitcher)
 
-compileAsC99()
+if (CMAKE_VERSION VERSION_LESS "3.1")
+  if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    set (CMAKE_C_FLAGS "--std=c99 ${CMAKE_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "--std=c++11 ${CMAKE_CXX_FLAGS}")
+  endif()
+else()
+  set (CMAKE_C_STANDARD 99)
+  set (CMAKE_CXX_STANDARD 11)
+endif()
 
 set(testrunnerswitcher_c_files
 ./src/testmutex.c
@@ -29,8 +37,8 @@ set(TESTRUNNERSWITCHER_INC_FOLDER ${CMAKE_CURRENT_LIST_DIR}/inc CACHE INTERNAL "
 
 include_directories(${TESTRUNNERSWITCHER_INC_FOLDER})
 
-add_files_to_install("./testtools/testrunnerswitcher/inc/testrunnerswitcher.h")
-add_files_to_install("./testtools/testrunnerswitcher/inc/testmutex.h")
+set(INSTALL_H_FILES ${INSTALL_H_FILES} "./testtools/testrunnerswitcher/inc/testrunnerswitcher.h" CACHE INTERNAL "Files that will be installed on the system")
+set(INSTALL_H_FILES ${INSTALL_H_FILES} "./testtools/testrunnerswitcher/inc/testmutex.h" CACHE INTERNAL "Files that will be installed on the system")
 
 if(WIN32)
 else()

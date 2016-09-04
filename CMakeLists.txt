@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(testrunnerswitcher)
 
+include (CTest)
+
 option(run_valgrind "set run_valgrind to ON if tests are to be run under valgrind/helgrind/drd. Default is OFF" OFF)
 
 if (CMAKE_VERSION VERSION_LESS "3.1")

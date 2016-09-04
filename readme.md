@@ -6,7 +6,7 @@ testrunnerswitcher is a simple library to switch test runners between azure-ctes
 
 ## Setup
 
-- Clone azure-uamqp-c by:
+- Clone azure-c-testrunnerswitcher by:
 ```
 git clone --recursive https://github.com/Azure/azure-c-testrunnerswitcher.git
 ```

@@ -4,7 +4,7 @@
 #ifndef TESTRUNNERSWITCHER_H
 #define TESTRUNNERSWITCHER_H
 
-#include "azure_c_shared_utility/macro_utils.h"
+#include "macro_utils.h"
 
 #ifdef __cplusplus
 #include <cstdbool>

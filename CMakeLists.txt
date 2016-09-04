@@ -41,6 +41,7 @@ include_directories(${TESTRUNNERSWITCHER_INC_FOLDER})
 
 set(INSTALL_H_FILES ${INSTALL_H_FILES} "./testtools/testrunnerswitcher/inc/testrunnerswitcher.h" CACHE INTERNAL "Files that will be installed on the system")
 set(INSTALL_H_FILES ${INSTALL_H_FILES} "./testtools/testrunnerswitcher/inc/testmutex.h" CACHE INTERNAL "Files that will be installed on the system")
+set(INSTALL_H_FILES ${INSTALL_H_FILES} "./testtools/testrunnerswitcher/inc/macro_utils.h" CACHE INTERNAL "Files that will be installed on the system")
 
 if(WIN32)
 else()

@@ -5,7 +5,7 @@
 set -e
 
 script_dir=$(cd "$(dirname "$0")" && pwd)
-build_root=$(cd "${script_dir}/../.." && pwd)
+build_root=$(cd "${script_dir}/.." && pwd)
 log_dir=$build_root
 make_install=
 build_folder=$build_root"/cmake"

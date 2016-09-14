@@ -4,4 +4,4 @@
 
 set -e
 
-./linux_c.sh
+./jenkins/linux_c.sh

@@ -3,10 +3,8 @@
 
 cmake_minimum_required(VERSION 2.8.11)
 
-if (DEFINED AZURE_C_TESTRUNNERSWITCHER_BUILT)
+if(TARGET testrunnerswitcher)
     RETURN()
-else()
-    SET(AZURE_C_TESTRUNNERSWITCHER_BUILT ON CACHE INTERNAL "This is the testrunnerswitcher built flag" FORCE)
 endif()
 
 project(testrunnerswitcher)

@@ -72,6 +72,8 @@ static bool EnumName##_Compare(EnumName left, EnumName right) \
     return left != right; \
 }
 
+#define TEST_USE_CTEST_FUNCTIONS_FOR_TYPE(my_type)
+
 #elif defined CPP_UNITTEST
 
 #ifdef _MSC_VER
@@ -158,6 +160,61 @@ namespace Microsoft \
         } \
     } \
 };
+
+#define TEST_USE_CTEST_FUNCTIONS_FOR_TYPE(my_type) \
+namespace Microsoft \
+{ \
+    namespace VisualStudio \
+    { \
+        namespace CppUnitTestFramework \
+        { \
+            template<> \
+            inline std::wstring ToString<my_type>(const my_type& value) \
+            { \
+                char temp_str[1024]; \
+                std::wstring result; \
+                if (C2(my_type,_ToString)(temp_str, sizeof(temp_str), value) != 0) \
+                { \
+                    return L""; \
+                } \
+                else \
+                { \
+                    int size_needed_in_chars = MultiByteToWideChar(CP_UTF8, 0, &temp_str[0], -1, NULL, 0); \
+                    if (size_needed_in_chars == 0) \
+                    { \
+                        result = L""; \
+                    } \
+                    else \
+                    { \
+                        WCHAR* widechar_string = (WCHAR*)malloc(size_needed_in_chars * sizeof(WCHAR)); \
+                        if (widechar_string == NULL) \
+                        { \
+                            result = L""; \
+                        } \
+                        else \
+                        { \
+                            if (MultiByteToWideChar(CP_UTF8, 0, temp_str, -1, widechar_string, size_needed_in_chars) == 0) \
+                            { \
+                                result = L""; \
+                            } \
+                            else \
+                            { \
+                                result = std::wstring(widechar_string); \
+                            } \
+                            free(widechar_string); \
+                        } \
+                    } \
+                } \
+                return result; \
+            } \
+            template<> \
+            static void Assert::AreEqual<my_type>(const my_type& expected, const my_type& actual, const wchar_t* message, const __LineInfo* pLineInfo) \
+            { \
+                FailOnCondition((C2(my_type,_Compare)(expected, actual) == 0), EQUALS_MESSAGE(expected, actual, message), pLineInfo); \
+            } \
+        } \
+    } \
+} \
 
 #else
 #error No test runner defined

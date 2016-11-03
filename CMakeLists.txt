@@ -9,6 +9,9 @@ endif()
 
 project(testrunnerswitcher)
 
+# Build with -fPIC always
+set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+
 include (CTest)
 
 option(run_valgrind "set run_valgrind to ON if tests are to be run under valgrind/helgrind/drd. Default is OFF" OFF)
@@ -48,7 +51,41 @@ set(INSTALL_H_FILES ${INSTALL_H_FILES} "./testtools/testrunnerswitcher/inc/testr
 set(INSTALL_H_FILES ${INSTALL_H_FILES} "./testtools/testrunnerswitcher/inc/testmutex.h" CACHE INTERNAL "Files that will be installed on the system")
 set(INSTALL_H_FILES ${INSTALL_H_FILES} "./testtools/testrunnerswitcher/inc/macro_utils.h" CACHE INTERNAL "Files that will be installed on the system")
 
-if(WIN32)
-else()
-	install (TARGETS testrunnerswitcher DESTINATION lib)
-endif (WIN32)
+# Set CMAKE_INSTALL_* if not defined
+include(GNUInstallDirs)
+
+if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+    set(CMAKE_INSTALL_LIBDIR "lib")
+endif()
+
+# Install Azure Test Runner Switcher
+set(package_location "cmake")
+
+install (TARGETS testrunnerswitcher EXPORT testrunnerswitcherTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/../bin
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install (FILES ${testrunnerswitcher_h_files} "./inc/macro_utils.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+include(CMakePackageConfigHelpers)
+
+configure_file("configs/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake"
+    COPYONLY
+)
+
+install(EXPORT testrunnerswitcherTargets
+    FILE
+        "${PROJECT_NAME}Targets.cmake"
+    DESTINATION
+        ${package_location}
+)
+install(
+    FILES
+        "configs/${PROJECT_NAME}Config.cmake"
+    DESTINATION
+        ${package_location}
+)
+

@@ -14,3 +14,28 @@ git clone --recursive https://github.com/Azure/azure-c-testrunnerswitcher.git
 - Switch to the cmake folder and run
    cmake ..
 - Build the code for your platform (msbuild for Windows, make for Linux, etc.)
+
+### Installation and Use
+Optionally, you may choose to install testrunnerswitcher on your machine:
+
+1. Switch to the *cmake* folder and run
+    ```
+    cmake --build . --target install
+    ```
+    or
+
+    Linux:
+    ```
+    sudo make install
+    ```
+
+    Windows:
+    ```
+    msbuild /m INSTALL.vcxproj
+    ```
+
+2. Use it in your project (if installed)
+    ```
+    find_package(testrunnerswitcher REQUIRED CONFIG)
+    target_link_library(yourlib testrunnerswitcher)
+    ```

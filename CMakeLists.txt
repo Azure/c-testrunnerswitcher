@@ -9,6 +9,8 @@ endif()
 
 project(testrunnerswitcher)
 
+set(TESTRUNNER_VERSION 1.1.0)
+
 # Build with -fPIC always
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
@@ -71,6 +73,12 @@ install (FILES ${testrunnerswitcher_h_files} "./inc/macro_utils.h" DESTINATION $
 
 include(CMakePackageConfigHelpers)
 
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${TESTRUNNER_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
 configure_file("configs/${PROJECT_NAME}Config.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake"
     COPYONLY
@@ -85,6 +93,7 @@ install(EXPORT testrunnerswitcherTargets
 install(
     FILES
         "configs/${PROJECT_NAME}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake"
     DESTINATION
         ${package_location}
 )

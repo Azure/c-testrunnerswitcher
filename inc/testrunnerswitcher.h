@@ -129,10 +129,7 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
     ASSERT_IS_NOT_NULL_WITH_MSG(semaphore, "Unable to acquire global semaphore");
 
 #define TEST_DEINITIALIZE_MEMORY_DEBUG(semaphore) \
-if (testmutex_release_global_semaphore(semaphore))\
-{                                                        \
-    REPORT_MEMORY_LEAKS;                                 \
-}                                                        \
+(void)testmutex_release_global_semaphore(semaphore);\
 
 #define TEST_ENUM_TYPE_HANDLER(EnumName, ...) \
 namespace Microsoft \
@@ -218,19 +215,6 @@ namespace Microsoft \
 
 #else
 #error No test runner defined
-#endif
-
-#ifdef _CRTDBG_MAP_ALLOC
-
-#ifdef CPP_UNITTEST
-#define WRITE_LEAK_MESSAGE Logger::WriteMessage(" Memory Leak found!!! Run test in debug mode & review Debug output for details.");
-#else
-#define WRITE_LEAK_MESSAGE ((void)0);
-#endif
-
-#define REPORT_MEMORY_LEAKS if (_CrtDumpMemoryLeaks()) { WRITE_LEAK_MESSAGE }
-#else
-#define REPORT_MEMORY_LEAKS ((void)0);
 #endif
 
 #endif

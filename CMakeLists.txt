@@ -9,7 +9,7 @@ endif()
 
 project(testrunnerswitcher)
 
-set(TESTRUNNER_VERSION 1.1.0)
+set(TESTRUNNER_VERSION 1.1.1)
 
 # Build with -fPIC always
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)

@@ -147,7 +147,6 @@ namespace Microsoft \
                 if((size_t)q>=sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])) \
                 { \
                     Assert::Fail(L"out of range value for " L#EnumName); \
-                    return L""; \
                 } \
                 else \
                 { \

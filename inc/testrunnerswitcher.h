@@ -8,8 +8,10 @@
 
 #ifdef __cplusplus
 #include <cstdbool>
+#include <cstring>
 #else
 #include <stdbool.h>
+#include <string.h>
 #endif
 
 #ifdef MBED_BUILD_TIMESTAMP
@@ -51,7 +53,8 @@ typedef void* TEST_MUTEX_HANDLE;
 #define RUN_TEST_SUITE(...)             CTEST_RUN_TEST_SUITE(__VA_ARGS__)
 
 #define TEST_MUTEX_CREATE()             (TEST_MUTEX_HANDLE)1
-#define TEST_MUTEX_ACQUIRE(mutex)       0
+// the strlen check is simply to shut the compiler up and not create a hell of #pragma warning suppress
+#define TEST_MUTEX_ACQUIRE(mutex)       (strlen("a") == 0)
 #define TEST_MUTEX_RELEASE(mutex)
 #define TEST_MUTEX_DESTROY(mutex)
 

@@ -55,8 +55,8 @@ typedef void* TEST_MUTEX_HANDLE;
 #define TEST_MUTEX_RELEASE(mutex)
 #define TEST_MUTEX_DESTROY(mutex)
 
-#define TEST_INITIALIZE_MEMORY_DEBUG(semaphore)
-#define TEST_DEINITIALIZE_MEMORY_DEBUG(semaphore)
+#define TEST_INITIALIZE_MEMORY_DEBUG(semaphore)     (void)(semaphore)
+#define TEST_DEINITIALIZE_MEMORY_DEBUG(semaphore)   (void)(semaphore)
 
 #define TEST_ENUM_TYPE_HANDLER(EnumName, ...) \
 const wchar_t *EnumName##_Strings[]= \

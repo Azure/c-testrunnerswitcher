@@ -3,7 +3,7 @@
 
 #include "testmutex.h"
 
-#ifdef WIN32
+#ifdef _MSC_VER
 
 #include "windows.h"
 
@@ -61,4 +61,4 @@ int testmutex_release_global_semaphore(TEST_MUTEX_HANDLE semaphore)
     }
     return result;
 }
-#endif
+#endif /* _MSC_VER */

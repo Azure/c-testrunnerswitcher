@@ -4,7 +4,7 @@
 #ifndef TESTMUTEX_H
 #define TESTMUTEX_H
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -22,7 +22,7 @@ extern "C" {
 }
 #endif
 
-#endif /* WIN32 */
+#endif /* _MSC_VER */
 
 #endif /*MICROMOCKTESTMUTEX_H*/
 

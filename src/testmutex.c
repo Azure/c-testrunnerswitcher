@@ -3,7 +3,7 @@
 
 #include "testmutex.h"
 
-#ifdef WIN32
+#ifdef _MSC_VER
 
 #include "windows.h"
 
@@ -47,8 +47,8 @@ TEST_MUTEX_HANDLE testmutex_acquire_global_semaphore(void)
 int testmutex_release_global_semaphore(TEST_MUTEX_HANDLE semaphore)
 {
     LONG prev;
-    (void)ReleaseSemaphore(semaphore, 1, &prev);
     int result;
+    (void)ReleaseSemaphore(semaphore, 1, &prev);
     
     if (prev == SEMAPHORE_HIGH_WATER - 1)
     {
@@ -61,4 +61,4 @@ int testmutex_release_global_semaphore(TEST_MUTEX_HANDLE semaphore)
     }
     return result;
 }
-#endif
+#endif /* _MSC_VER */

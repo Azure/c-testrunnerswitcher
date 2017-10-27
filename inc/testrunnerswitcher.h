@@ -7,7 +7,6 @@
 #include "macro_utils.h"
 
 #ifdef __cplusplus
-#include <cstdbool>
 #include <cstring>
 #else
 #include <stdbool.h>

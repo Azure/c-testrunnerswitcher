@@ -61,4 +61,11 @@ int testmutex_release_global_semaphore(TEST_MUTEX_HANDLE semaphore)
     }
     return result;
 }
+#else
+
+// XCode complains about a library with no exported functions
+extern void dummy_function_to_silence_compiler_is_never_called()
+{
+}
+
 #endif /* _MSC_VER */

@@ -4,7 +4,11 @@
 /*THIS FILE IS GENERATED*/
 /*DO NOT EDIT BY HAND!!!*/
 /*instead edit macro_utils.tt here: http://www.github.com/azure/azure-macro-utils-c.git */
-/*and then copy the generated file overwriting this one*/
+/*and then propagate the generated file to all the repos*/
+/* !!! CAUTION!!! This file is copied to multiple places */
+/* in https://github.com/Azure/azure-c-shared-utility.git, */
+/* and all of these copies must be located and replaced. */
+
 
 
 #ifndef MACRO_UTILS_H
@@ -12616,6 +12620,6 @@ int C2(enumName, _FromString)(const char* enumAsString, enumName* destination)  
 #define DEFINE_MICROMOCK_ENUM_TO_STRING(type, ...) MICROMOCK_ENUM_TO_STRING(type, FOR_EACH_1(DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING, __VA_ARGS__));
 
 #define EMPTY()
-#define DELAY(id) id EMPTY LPAREN )
+#define MACRO_UTILS_DELAY(id) id EMPTY LPAREN )
 
 #endif /*MACRO_UTILS_H*/

@@ -214,20 +214,20 @@ namespace Microsoft \
     } \
 } \
 
-///*because for some reason this is not defined by Visual Studio, it is defined here, so it is not multiplied in every single other unittest*/
-//namespace Microsoft
-//{
-//    namespace VisualStudio
-//    {
-//        namespace CppUnitTestFramework
-//        {
-//            template<> inline std::wstring ToString<int64_t>(const int64_t& t)
-//            {
-//                RETURN_WIDE_STRING(t);
-//            }
-//        }
-//    }
-//}
+/*because for some reason this is not defined by Visual Studio, it is defined here, so it is not multiplied in every single other unittest*/
+namespace Microsoft
+{
+    namespace VisualStudio
+    {
+        namespace CppUnitTestFramework
+        {
+            template<> inline std::wstring ToString<int64_t>(const int64_t& t)
+            {
+                RETURN_WIDE_STRING(t);
+            }
+        }
+    }
+}
 
 #else
 #error No test runner defined

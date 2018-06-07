@@ -105,10 +105,10 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
 
 #define TEST_FUNCTION(name)             TEST_METHOD(name)
 
-#define ASSERT_ARE_EQUAL(type, A, B)                        Assert::AreEqual((type)A, (type)B)
-#define ASSERT_ARE_EQUAL_WITH_MSG(type, A, B, message)      Assert::AreEqual((type)A, (type)B, ToString(message).c_str())
-#define ASSERT_ARE_NOT_EQUAL(type, A, B)                    Assert::AreNotEqual((type)A, (type)B)
-#define ASSERT_ARE_NOT_EQUAL_WITH_MSG(type, A, B, message)  Assert::AreNotEqual((type)A, (type)B, ToString(message).c_str())
+#define ASSERT_ARE_EQUAL(type, A, B)                        Assert::AreEqual((type)(A), (type)(B))
+#define ASSERT_ARE_EQUAL_WITH_MSG(type, A, B, message)      Assert::AreEqual((type)(A), (type)(B), ToString(message).c_str())
+#define ASSERT_ARE_NOT_EQUAL(type, A, B)                    Assert::AreNotEqual((type)(A), (type)(B))
+#define ASSERT_ARE_NOT_EQUAL_WITH_MSG(type, A, B, message)  Assert::AreNotEqual((type)(A), (type)(B), ToString(message).c_str())
 #define ASSERT_FAIL(message)                                Assert::Fail(ToString(message).c_str())
 #define ASSERT_IS_TRUE(expression)                          Assert::IsTrue(expression)
 #define ASSERT_IS_TRUE_WITH_MSG(expression, message)        Assert::IsTrue(expression, ToString(message).c_str())

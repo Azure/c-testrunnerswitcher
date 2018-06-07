@@ -225,6 +225,10 @@ namespace Microsoft
             {
                 RETURN_WIDE_STRING(t);
             }
+            template<> inline std::wstring ToString<uint16_t>(const uint16_t& t)
+            {
+                RETURN_WIDE_STRING(t);
+            }
         }
     }
 }

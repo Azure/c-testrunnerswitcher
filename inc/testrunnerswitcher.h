@@ -67,7 +67,7 @@ __VA_ARGS__ \
 }; \
 static void EnumName##_ToString(char* dest, size_t bufferSize, EnumName enumValue) \
 { \
-    (void)snprintf(dest, bufferSize, "%S", EnumName##_Strings[enumValue]); \
+    (void)snprintf(dest, bufferSize, "%ls", EnumName##_Strings[enumValue]); \
 } \
 static bool EnumName##_Compare(EnumName left, EnumName right) \
 { \

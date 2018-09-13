@@ -61,7 +61,7 @@ typedef void* TEST_MUTEX_HANDLE;
 #define TEST_DEINITIALIZE_MEMORY_DEBUG(semaphore)   (void)(semaphore)
 
 #define TEST_ENUM_TYPE_HANDLER(EnumName, ...) \
-const wchar_t *EnumName##_Strings[]= \
+static const wchar_t *EnumName##_Strings[]= \
 { \
 __VA_ARGS__ \
 }; \

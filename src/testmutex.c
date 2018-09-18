@@ -7,7 +7,7 @@
 
 #include "windows.h"
 
-#define SEMAPHORE_HIGH_WATER 1000000
+#define SEMAPHORE_HIGH_WATER 1
 
 TEST_MUTEX_HANDLE testmutex_create(void)
 {

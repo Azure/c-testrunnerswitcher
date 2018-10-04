@@ -36,18 +36,12 @@ typedef void* TEST_MUTEX_HANDLE;
 #define TEST_FUNCTION(name)             CTEST_FUNCTION(name)
 
 #define ASSERT_ARE_EQUAL                CTEST_ASSERT_ARE_EQUAL
-#define ASSERT_ARE_EQUAL_WITH_MSG       CTEST_ASSERT_ARE_EQUAL_WITH_MSG
 #define ASSERT_ARE_NOT_EQUAL            CTEST_ASSERT_ARE_NOT_EQUAL
-#define ASSERT_ARE_NOT_EQUAL_WITH_MSG   CTEST_ASSERT_ARE_NOT_EQUAL_WITH_MSG
 #define ASSERT_FAIL                     CTEST_ASSERT_FAIL
 #define ASSERT_IS_NULL                  CTEST_ASSERT_IS_NULL
-#define ASSERT_IS_NULL_WITH_MSG         CTEST_ASSERT_IS_NULL_WITH_MSG
 #define ASSERT_IS_NOT_NULL              CTEST_ASSERT_IS_NOT_NULL
-#define ASSERT_IS_NOT_NULL_WITH_MSG     CTEST_ASSERT_IS_NOT_NULL_WITH_MSG
 #define ASSERT_IS_TRUE                  CTEST_ASSERT_IS_TRUE
-#define ASSERT_IS_TRUE_WITH_MSG         CTEST_ASSERT_IS_TRUE_WITH_MSG
 #define ASSERT_IS_FALSE                 CTEST_ASSERT_IS_FALSE
-#define ASSERT_IS_FALSE_WITH_MSG        CTEST_ASSERT_IS_FALSE_WITH_MSG
 
 #define RUN_TEST_SUITE(...)             CTEST_RUN_TEST_SUITE(__VA_ARGS__)
 
@@ -84,6 +78,7 @@ static bool EnumName##_Compare(EnumName left, EnumName right) \
 
 #include "CppUnitTest.h"
 #include "testmutex.h"
+#include "ctrs_sprintf.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -105,19 +100,72 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
 
 #define TEST_FUNCTION(name)             TEST_METHOD(name)
 
-#define ASSERT_ARE_EQUAL(type, A, B)                        Assert::AreEqual((type)(A), (type)(B))
-#define ASSERT_ARE_EQUAL_WITH_MSG(type, A, B, message)      Assert::AreEqual((type)(A), (type)(B), ToString(message).c_str())
-#define ASSERT_ARE_NOT_EQUAL(type, A, B)                    Assert::AreNotEqual((type)(A), (type)(B))
-#define ASSERT_ARE_NOT_EQUAL_WITH_MSG(type, A, B, message)  Assert::AreNotEqual((type)(A), (type)(B), ToString(message).c_str())
-#define ASSERT_FAIL(message)                                Assert::Fail(ToString(message).c_str())
-#define ASSERT_IS_TRUE(expression)                          Assert::IsTrue(expression)
-#define ASSERT_IS_TRUE_WITH_MSG(expression, message)        Assert::IsTrue(expression, ToString(message).c_str())
-#define ASSERT_IS_FALSE(expression)                         Assert::IsFalse(expression)
-#define ASSERT_IS_FALSE_WITH_MSG(expression, message)       Assert::IsFalse(expression, ToString(message).c_str())
-#define ASSERT_IS_NOT_NULL(value)                           Assert::IsNotNull(value)
-#define ASSERT_IS_NOT_NULL_WITH_MSG(value, message)         Assert::IsNotNull(value, ToString(message).c_str())
-#define ASSERT_IS_NULL(value)                               Assert::IsNull(value)
-#define ASSERT_IS_NULL_WITH_MSG(value, message)             Assert::IsNull(value, ToString(message).c_str())
+// these are generic macros for formatting the optional message
+// they can be used in all the ASSERT macros without repeating the code over and over again
+#define CONSTRUCT_CTRS_MESSAGE_FORMATTED(format, ...) \
+    IF(COUNT_ARG(__VA_ARGS__), ctrs_sprintf_char(format, __VA_ARGS__), ctrs_sprintf_char(format));
+
+#define CONSTRUCT_CTRS_MESSAGE_FORMATTED_EMPTY(...) \
+    NULL
+
+#define CONSTRUCT_CTRS_MESSAGE(...) \
+    IF(COUNT_ARG(__VA_ARGS__), CONSTRUCT_CTRS_MESSAGE_FORMATTED, CONSTRUCT_CTRS_MESSAGE_FORMATTED_EMPTY)(__VA_ARGS__)
+
+#define ASSERT_ARE_EQUAL(type, A, B, ...) \
+    do \
+    { \
+        char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
+        Assert::AreEqual((type)(A), (type)(B), ToString(message).c_str()); \
+        ctrs_sprintf_free(message); \
+    } while ((void)0, 0)
+
+#define ASSERT_ARE_NOT_EQUAL(type, A, B, ...) \
+    do \
+    { \
+        char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
+        Assert::AreNotEqual((type)(A), (type)(B), ToString(message).c_str()); \
+        ctrs_sprintf_free(message); \
+    } while ((void)0, 0)
+
+#define ASSERT_FAIL(...) \
+    do \
+    { \
+        char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
+        Assert::Fail(ToString(message).c_str()); \
+        ctrs_sprintf_free(message); \
+    } while ((void)0, 0)
+
+#define ASSERT_IS_TRUE(expression, ...) \
+    do \
+    { \
+        char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
+        Assert::IsTrue((expression), ToString(message).c_str()); \
+        ctrs_sprintf_free(message); \
+    } while ((void)0, 0)
+
+#define ASSERT_IS_FALSE(expression, ...) \
+    do \
+    { \
+        char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
+        Assert::IsFalse((expression), ToString(message).c_str()); \
+        ctrs_sprintf_free(message); \
+    } while ((void)0, 0)
+
+#define ASSERT_IS_NOT_NULL(value, ...) \
+    do \
+    { \
+        char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
+        Assert::IsNotNull((value), ToString(message).c_str()); \
+        ctrs_sprintf_free(message); \
+    } while ((void)0, 0)
+
+#define ASSERT_IS_NULL(value, ...) \
+    do \
+    { \
+        char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
+        Assert::IsNull((value), ToString(message).c_str()); \
+        ctrs_sprintf_free(message); \
+    } while ((void)0, 0)
 
 #define RUN_TEST_SUITE(...)
 
@@ -128,7 +176,7 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
 
 #define TEST_INITIALIZE_MEMORY_DEBUG(semaphore) \
     semaphore = testmutex_acquire_global_semaphore(); \
-    ASSERT_IS_NOT_NULL_WITH_MSG(semaphore, "Unable to acquire global semaphore");
+    ASSERT_IS_NOT_NULL(semaphore, "Unable to acquire global semaphore");
 
 #define TEST_DEINITIALIZE_MEMORY_DEBUG(semaphore) \
 (void)testmutex_release_global_semaphore(semaphore);\

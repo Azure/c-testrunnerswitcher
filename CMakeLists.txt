@@ -30,10 +30,12 @@ endif()
 
 set(testrunnerswitcher_c_files
 ./src/testmutex.c
+./src/ctrs_sprintf.c
 )
 
 set(testrunnerswitcher_h_files
 ./inc/testrunnerswitcher.h
+./inc/ctrs_sprintf.h
 ./inc/testmutex.h
 )
 

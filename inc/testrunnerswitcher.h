@@ -115,56 +115,63 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
     do \
     { \
         char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
-        Assert::AreEqual((type)(A), (type)(B), ToString(message).c_str()); \
+        std::wstring cppUnitTestMessage = ToString(message); \
         ctrs_sprintf_free(message); \
+        Assert::AreEqual((type)(A), (type)(B), cppUnitTestMessage.c_str()); \
     } while ((void)0, 0)
 
 #define ASSERT_ARE_NOT_EQUAL(type, A, B, ...) \
     do \
     { \
         char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
-        Assert::AreNotEqual((type)(A), (type)(B), ToString(message).c_str()); \
+        std::wstring cppUnitTestMessage = ToString(message); \
         ctrs_sprintf_free(message); \
+        Assert::AreNotEqual((type)(A), (type)(B), cppUnitTestMessage.c_str()); \
     } while ((void)0, 0)
 
 #define ASSERT_FAIL(...) \
     do \
     { \
         char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
-        Assert::Fail(ToString(message).c_str()); \
+        std::wstring cppUnitTestMessage = ToString(message); \
         ctrs_sprintf_free(message); \
+        Assert::Fail(cppUnitTestMessage.c_str()); \
     } while ((void)0, 0)
 
 #define ASSERT_IS_TRUE(expression, ...) \
     do \
     { \
         char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
-        Assert::IsTrue((expression), ToString(message).c_str()); \
+        std::wstring cppUnitTestMessage = ToString(message); \
         ctrs_sprintf_free(message); \
+        Assert::IsTrue((expression), cppUnitTestMessage.c_str()); \
     } while ((void)0, 0)
 
 #define ASSERT_IS_FALSE(expression, ...) \
     do \
     { \
         char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
-        Assert::IsFalse((expression), ToString(message).c_str()); \
+        std::wstring cppUnitTestMessage = ToString(message); \
         ctrs_sprintf_free(message); \
+        Assert::IsFalse((expression), cppUnitTestMessage.c_str()); \
     } while ((void)0, 0)
 
 #define ASSERT_IS_NOT_NULL(value, ...) \
     do \
     { \
         char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
-        Assert::IsNotNull((value), ToString(message).c_str()); \
+        std::wstring cppUnitTestMessage = ToString(message); \
         ctrs_sprintf_free(message); \
+        Assert::IsNotNull((value), cppUnitTestMessage.c_str()); \
     } while ((void)0, 0)
 
 #define ASSERT_IS_NULL(value, ...) \
     do \
     { \
         char* message = CONSTRUCT_CTRS_MESSAGE(__VA_ARGS__); \
-        Assert::IsNull((value), ToString(message).c_str()); \
+        std::wstring cppUnitTestMessage = ToString(message); \
         ctrs_sprintf_free(message); \
+        Assert::IsNull((value), cppUnitTestMessage.c_str()); \
     } while ((void)0, 0)
 
 #define RUN_TEST_SUITE(...)

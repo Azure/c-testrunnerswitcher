@@ -19,7 +19,7 @@
 
 typedef void* TEST_MUTEX_HANDLE;
 
-#define TEST_DEFINE_ENUM_TYPE(type, ...) TEST_ENUM_TYPE_HANDLER(type, FOR_EACH_1(DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING, __VA_ARGS__));
+#define TEST_DEFINE_ENUM_TYPE(type, ...) TEST_ENUM_TYPE_HANDLER(type, MU_FOR_EACH_1(MU_DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING, __VA_ARGS__));
 
 #ifdef USE_CTEST
 
@@ -103,13 +103,13 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
 // these are generic macros for formatting the optional message
 // they can be used in all the ASSERT macros without repeating the code over and over again
 #define CONSTRUCT_CTRS_MESSAGE_FORMATTED(format, ...) \
-    IF(COUNT_ARG(__VA_ARGS__), ctrs_sprintf_char(format, __VA_ARGS__), ctrs_sprintf_char(format));
+    MU_IF(MU_COUNT_ARG(__VA_ARGS__), ctrs_sprintf_char(format, __VA_ARGS__), ctrs_sprintf_char(format));
 
 #define CONSTRUCT_CTRS_MESSAGE_FORMATTED_EMPTY(...) \
     NULL
 
 #define CONSTRUCT_CTRS_MESSAGE(...) \
-    IF(COUNT_ARG(__VA_ARGS__), CONSTRUCT_CTRS_MESSAGE_FORMATTED, CONSTRUCT_CTRS_MESSAGE_FORMATTED_EMPTY)(__VA_ARGS__)
+    MU_IF(MU_COUNT_ARG(__VA_ARGS__), CONSTRUCT_CTRS_MESSAGE_FORMATTED, CONSTRUCT_CTRS_MESSAGE_FORMATTED_EMPTY)(__VA_ARGS__)
 
 #define ASSERT_ARE_EQUAL(type, A, B, ...) \
     do \
@@ -226,7 +226,7 @@ namespace Microsoft \
             { \
                 char temp_str[1024]; \
                 std::wstring result; \
-                if (C2(my_type,_ToString)(temp_str, sizeof(temp_str), value) != 0) \
+                if (MU_C2(my_type,_ToString)(temp_str, sizeof(temp_str), value) != 0) \
                 { \
                     return L""; \
                 } \
@@ -263,7 +263,7 @@ namespace Microsoft \
             template<> \
             static void Assert::AreEqual<my_type>(const my_type& expected, const my_type& actual, const wchar_t* message, const __LineInfo* pLineInfo) \
             { \
-                FailOnCondition((C2(my_type,_Compare)(expected, actual) == 0), EQUALS_MESSAGE(expected, actual, message), pLineInfo); \
+                FailOnCondition((MU_C2(my_type,_Compare)(expected, actual) == 0), EQUALS_MESSAGE(expected, actual, message), pLineInfo); \
             } \
         } \
     } \

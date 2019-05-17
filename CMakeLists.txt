@@ -17,6 +17,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 include (CTest)
 
 option(run_valgrind "set run_valgrind to ON if tests are to be run under valgrind/helgrind/drd. Default is OFF" OFF)
+option(use_installed_dependencies "set use_installed_dependencies to ON to use installed packages instead of building dependencies from submodules" OFF)
 
 if (CMAKE_VERSION VERSION_LESS "3.1")
   if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -26,6 +27,22 @@ if (CMAKE_VERSION VERSION_LESS "3.1")
 else()
   set (CMAKE_C_STANDARD 99)
   set (CMAKE_CXX_STANDARD 11)
+endif()
+
+if(${use_installed_dependencies})
+    if (NOT azure_macro_utils_cFOUND)
+        find_package(azure_macro_utils_c REQUIRED CONFIG)
+        include_directories(${MACRO_UTILS_INC_FOLDER})
+    endif()
+else()
+    if (NOT TARGET azure_macro_utils_c)
+        if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/azure-macro-utils-c/CMakeLists.txt)
+            add_subdirectory(deps/azure-macro-utils-c)
+            include_directories(${MACRO_UTILS_INC_FOLDER})
+        else()
+            message(FATAL_ERROR "Could not find azure_macro_utils_c")
+        endif()
+    endif()
 endif()
 
 set(testrunnerswitcher_c_files
@@ -67,7 +84,8 @@ install (TARGETS testrunnerswitcher EXPORT testrunnerswitcherTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/../bin
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
-install (FILES ${testrunnerswitcher_h_files} "./inc/macro_utils.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install (FILES ${testrunnerswitcher_h_files} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 include(CMakePackageConfigHelpers)
 

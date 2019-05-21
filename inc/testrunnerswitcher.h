@@ -4,13 +4,16 @@
 #ifndef TESTRUNNERSWITCHER_H
 #define TESTRUNNERSWITCHER_H
 
-#include "macro_utils.h"
+#include "azure_macro_utils/macro_utils.h"
 
 #ifdef __cplusplus
 #include <cstring>
+#include <cstdint>
 #else
 #include <stdbool.h>
 #include <string.h>
+#include <stdint.h>
+
 #endif
 
 #ifdef MBED_BUILD_TIMESTAMP
@@ -276,10 +279,14 @@ namespace Microsoft
     {
         namespace CppUnitTestFramework
         {
+
+/*Visual Studio 2019 version 16.1.0 has in C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\VS\UnitTest\include\CppUnitTestAssert.h the same template*/
+#if _MSC_VER < 1921
             template<> inline std::wstring ToString<int64_t>(const int64_t& t)
             {
                 RETURN_WIDE_STRING(t);
             }
+#endif
             template<> inline std::wstring ToString<uint16_t>(const uint16_t& t)
             {
                 RETURN_WIDE_STRING(t);

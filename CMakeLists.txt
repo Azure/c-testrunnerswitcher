@@ -53,6 +53,7 @@ set(testrunnerswitcher_c_files
 set(testrunnerswitcher_h_files
 ./inc/testrunnerswitcher.h
 ./inc/ctrs_sprintf.h
+./inc/ctrs_leak_check.h
 ./inc/testmutex.h
 )
 

@@ -62,10 +62,17 @@ static const wchar_t *EnumName##_Strings[]= \
 { \
 __VA_ARGS__ \
 }; \
-static void EnumName##_ToString(char* dest, size_t bufferSize, EnumName enumValue) \
-{ \
-    (void)snprintf(dest, bufferSize, "%ls", EnumName##_Strings[enumValue]); \
-} \
+static void EnumName##_ToString(char* dest, size_t bufferSize, EnumName enumValue)                                                  \
+{                                                                                                                                   \
+    if(enumValue<(sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])))                                                        \
+    {                                                                                                                               \
+        (void)snprintf(dest, bufferSize, "%ls", EnumName##_Strings[enumValue]);                                                     \
+    }                                                                                                                               \
+    else                                                                                                                            \
+    {                                                                                                                               \
+        (void)snprintf(dest, bufferSize, C3("%d is out of bounds value for ", MU_TOSTRING(EnumName), ""), enumValue);               \
+    }                                                                                                                               \
+}                                                                                                                                   \
 static bool EnumName##_Compare(EnumName left, EnumName right) \
 { \
     return left != right; \

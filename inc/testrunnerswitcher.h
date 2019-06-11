@@ -70,7 +70,7 @@ static void EnumName##_ToString(char* dest, size_t bufferSize, EnumName enumValu
     }                                                                                                                               \
     else                                                                                                                            \
     {                                                                                                                               \
-        (void)snprintf(dest, bufferSize, C3("%d is out of bounds value for ", MU_TOSTRING(EnumName), ""), enumValue);               \
+        (void)snprintf(dest, bufferSize, "%d is out of bounds value for " MU_TOSTRING(EnumName), enumValue);                       \
     }                                                                                                                               \
 }                                                                                                                                   \
 static bool EnumName##_Compare(EnumName left, EnumName right) \

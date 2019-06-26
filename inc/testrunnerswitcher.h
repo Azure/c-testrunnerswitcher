@@ -191,13 +191,6 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
 #define TEST_MUTEX_RELEASE(mutex)                           testmutex_release(mutex)
 #define TEST_MUTEX_DESTROY(mutex)                           testmutex_destroy(mutex)
 
-#define TEST_INITIALIZE_MEMORY_DEBUG(semaphore) \
-    semaphore = testmutex_acquire_global_semaphore(); \
-    ASSERT_IS_NOT_NULL(semaphore, "Unable to acquire global semaphore");
-
-#define TEST_DEINITIALIZE_MEMORY_DEBUG(semaphore) \
-(void)testmutex_release_global_semaphore(semaphore);\
-
 #define TEST_ENUM_TYPE_HANDLER(EnumName, ...) \
 namespace Microsoft \
 { \

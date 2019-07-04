@@ -61,7 +61,7 @@ __VA_ARGS__ \
 }; \
 static void EnumName##_ToString(char* dest, size_t bufferSize, EnumName enumValue)                                                  \
 {                                                                                                                                   \
-    if(enumValue<(sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])))                                                        \
+    if((int)enumValue<(int)(sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])))                                              \
     {                                                                                                                               \
         (void)snprintf(dest, bufferSize, "%ls", EnumName##_Strings[enumValue]);                                                     \
     }                                                                                                                               \

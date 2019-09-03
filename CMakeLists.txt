@@ -61,7 +61,7 @@ add_library(testrunnerswitcher ${testrunnerswitcher_c_files} ${testrunnerswitche
 target_include_directories(testrunnerswitcher
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/inc>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/testrunnerswitcher>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 set_target_properties(testrunnerswitcher

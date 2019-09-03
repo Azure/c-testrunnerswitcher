@@ -58,6 +58,12 @@ set(testrunnerswitcher_h_files
 
 add_library(testrunnerswitcher ${testrunnerswitcher_c_files} ${testrunnerswitcher_h_files})
 
+target_include_directories(testrunnerswitcher
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/inc>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/testrunnerswitcher>
+)
+
 set_target_properties(testrunnerswitcher
                PROPERTIES
                FOLDER "test_tools") 

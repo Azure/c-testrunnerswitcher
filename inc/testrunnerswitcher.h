@@ -23,7 +23,7 @@
 typedef void* TEST_MUTEX_HANDLE;
 
 #define USE_ONLY_ENUM_NAMES(count, enum_value_name, enum_value_value) enum_value_name MU_IF_COMMA(count)
-#define DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING(x, y) MU_C2(L, MU_TOSTRING(x)) , 
+#define DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING(x, y) MU_C2(L, MU_TOSTRING(x)) ,
 
 #define TEST_DEFINE_ENUM_TYPE(type, ...) TEST_ENUM_TYPE_HANDLER(type, MU_FOR_EACH_1(MU_DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING, __VA_ARGS__));
 #define TEST_DEFINE_ENUM_2_TYPE(type, ...) TEST_ENUM_2_TYPE_HANDLER(type, MU_FOR_EACH_2(DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING, __VA_ARGS__));
@@ -107,6 +107,7 @@ static bool EnumName##_Compare(EnumName left, EnumName right) \
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 typedef const char* char_ptr;
+typedef const wchar_t* wchar_ptr;
 typedef void* void_ptr;
 
 #ifdef CPPUNITTEST_SYMBOL

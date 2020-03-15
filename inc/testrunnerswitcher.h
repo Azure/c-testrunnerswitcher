@@ -67,7 +67,7 @@ __VA_ARGS__ \
 }; \
 static void EnumName##_ToString(char* dest, size_t bufferSize, EnumName enumValue)                                                  \
 {                                                                                                                                   \
-    if((int)enumValue<(int)(sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])))                                              \
+    if(((int)enumValue>=0) && (int)enumValue<(int)(sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])))                       \
     {                                                                                                                               \
         (void)snprintf(dest, bufferSize, "%ls", EnumName##_Strings[enumValue]);                                                     \
     }                                                                                                                               \
@@ -219,7 +219,7 @@ namespace Microsoft \
             }; \
             template <> std::wstring ToString < EnumName > (const EnumName & q)  \
             {  \
-                if((size_t)q>=sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])) \
+                if((q<0)||(size_t)q>=sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])) \
                 { \
                     return(L"out of range value for " L#EnumName); \
                 } \

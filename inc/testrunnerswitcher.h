@@ -50,7 +50,8 @@ typedef void* TEST_MUTEX_HANDLE;
 #define ASSERT_IS_TRUE                  CTEST_ASSERT_IS_TRUE
 #define ASSERT_IS_FALSE                 CTEST_ASSERT_IS_FALSE
 
-#define RUN_TEST_SUITE(...)             CTEST_RUN_TEST_SUITE(__VA_ARGS__)
+#define RUN_TEST_SUITE(...)                         CTEST_RUN_TEST_SUITE(__VA_ARGS__)
+#define RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(...) CTEST_RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(__VA_ARGS__)
 
 #define TEST_MUTEX_CREATE()             (TEST_MUTEX_HANDLE)1
 // the strlen check is simply to shut the compiler up and not create a hell of #pragma warning suppress
@@ -200,6 +201,7 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
     } while ((void)0, 0)
 
 #define RUN_TEST_SUITE(...)
+#define RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(...)
 
 #define TEST_MUTEX_CREATE()                                 testmutex_create()
 #define TEST_MUTEX_ACQUIRE(mutex)                           testmutex_acquire(mutex)

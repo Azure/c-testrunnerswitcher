@@ -19,31 +19,32 @@ include (CTest)
 option(run_valgrind "set run_valgrind to ON if tests are to be run under valgrind/helgrind/drd. Default is OFF" OFF)
 option(use_installed_dependencies "set use_installed_dependencies to ON to use installed packages instead of building dependencies from submodules" OFF)
 
-if (CMAKE_VERSION VERSION_LESS "3.1")
-  if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    set (CMAKE_C_FLAGS "--std=c99 ${CMAKE_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "--std=c++11 ${CMAKE_CXX_FLAGS}")
-  endif()
-else()
-  set (CMAKE_C_STANDARD 99)
-  set (CMAKE_CXX_STANDARD 11)
-endif()
+#bring in dependencies
+#do not add or build any tests of the dependencies
+set(original_run_e2e_tests ${run_e2e_tests})
+set(original_run_int_tests ${run_int_tests})
+set(original_run_perf_tests ${run_perf_tests})
+set(original_run_unittests ${run_unittests})
+set(original_run_traceability ${run_traceability})
 
-if(${use_installed_dependencies})
-    if (NOT azure_macro_utils_cFOUND)
-        find_package(azure_macro_utils_c REQUIRED CONFIG)
-        include_directories(${MACRO_UTILS_INC_FOLDER})
-    endif()
-else()
-    if (NOT TARGET azure_macro_utils_c)
-        if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/azure-macro-utils-c/CMakeLists.txt)
-            add_subdirectory(deps/azure-macro-utils-c)
-            include_directories(${MACRO_UTILS_INC_FOLDER})
-        else()
-	    message(FATAL_ERROR "Could not find azure_macro_utils_c. Run 'git submodule update --init'")
-        endif()
-    endif()
-endif()
+set(run_e2e_tests OFF)
+set(run_int_tests OFF)
+set(run_perf_tests OFF)
+set(run_unittests OFF)
+set(run_traceability OFF)
+
+add_subdirectory(deps/azure-c-build-tools)
+set_default_build_options()
+    
+add_subdirectory(deps/azure-macro-utils-c)
+include_directories(${MACRO_UTILS_INC_FOLDER})
+
+set(run_e2e_tests ${original_run_e2e_tests})
+set(run_int_tests ${original_run_int_tests})
+set(run_perf_tests ${original_run_perf_tests})
+set(run_unittests ${original_run_unittests})
+set(run_traceability ${original_run_traceability})
+
 
 set(testrunnerswitcher_c_files
 ./src/testmutex.c

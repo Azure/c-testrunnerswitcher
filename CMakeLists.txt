@@ -19,19 +19,32 @@ include (CTest)
 option(run_valgrind "set run_valgrind to ON if tests are to be run under valgrind/helgrind/drd. Default is OFF" OFF)
 option(use_installed_dependencies "set use_installed_dependencies to ON to use installed packages instead of building dependencies from submodules" OFF)
 
-if ((NOT TARGET azure_c_build_tools) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/azure-c-build-tools/CMakeLists.txt))
-    add_subdirectory(deps/azure-c-build-tools)
-endif()
-set_default_build_options() 
+#bring in dependencies
+#do not add or build any tests of the dependencies
+set(original_run_e2e_tests ${run_e2e_tests})
+set(original_run_int_tests ${run_int_tests})
+set(original_run_perf_tests ${run_perf_tests})
+set(original_run_unittests ${run_unittests})
+set(original_run_traceability ${run_traceability})
+
+set(run_e2e_tests OFF)
+set(run_int_tests OFF)
+set(run_perf_tests OFF)
+set(run_unittests OFF)
+set(run_traceability OFF)
+
+add_subdirectory(deps/azure-c-build-tools)
+set_default_build_options()
     
-if (NOT TARGET azure_macro_utils_c)
-    if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/azure-macro-utils-c/CMakeLists.txt)
-        add_subdirectory(deps/azure-macro-utils-c)
-        include_directories(${MACRO_UTILS_INC_FOLDER})
-    else()
-	    message(FATAL_ERROR "Could not find azure_macro_utils_c. Run 'git submodule update --init'")
-    endif()
-endif()
+add_subdirectory(deps/azure-macro-utils-c)
+include_directories(${MACRO_UTILS_INC_FOLDER})
+
+set(run_e2e_tests ${original_run_e2e_tests})
+set(run_int_tests ${original_run_int_tests})
+set(run_perf_tests ${original_run_perf_tests})
+set(run_unittests ${original_run_unittests})
+set(run_traceability ${original_run_traceability})
+
 
 set(testrunnerswitcher_c_files
 ./src/testmutex.c

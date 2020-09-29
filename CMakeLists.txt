@@ -43,6 +43,11 @@ else()
 	    message(FATAL_ERROR "Could not find azure_macro_utils_c. Run 'git submodule update --init'")
         endif()
     endif()
+    
+    if ((NOT TARGET azure_c_build_tools) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/azure-c-build-tools/CMakeLists.txt))
+        add_subdirectory(deps/azure-c-build-tools)
+    endif()
+    set_default_build_options() 
 endif()
 
 set(testrunnerswitcher_c_files

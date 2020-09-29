@@ -33,8 +33,6 @@ if (NOT TARGET azure_macro_utils_c)
     endif()
 endif()
 
-endif()
-
 set(testrunnerswitcher_c_files
 ./src/testmutex.c
 ./src/ctrs_sprintf.c

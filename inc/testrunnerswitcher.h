@@ -223,7 +223,7 @@ namespace Microsoft \
             {  \
                 if((q<0)||(size_t)q>=sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])) \
                 { \
-                    return(L"out of range value for " L#EnumName); \
+                    return(L"out of range value for " #EnumName); \
                 } \
                 else \
                 { \

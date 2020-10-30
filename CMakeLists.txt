@@ -3,10 +3,10 @@
 
 cmake_minimum_required(VERSION 2.8.11)
 
-# canon way of using azure-c-testrunnerswitcher from another repo is below. It assumes the using repo has placed azure-c-testrunnerswitcher in "deps"
+# canon way of using c-testrunnerswitcher from another repo is below. It assumes the using repo has placed c-testrunnerswitcher in "deps"
 
-#if ((NOT TARGET testrunnerswitcher) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/azure-c-testrunnerswitcher/CMakeLists.txt))
-#    add_subdirectory(deps/azure-c-testrunnerswitcher)
+#if ((NOT TARGET testrunnerswitcher) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/c-testrunnerswitcher/CMakeLists.txt))
+#    add_subdirectory(deps/c-testrunnerswitcher)
 #    include_directories(${TESTRUNNERSWITCHER_INC_FOLDER})
 #endif() 
 
@@ -40,13 +40,13 @@ set(run_perf_tests OFF)
 set(run_unittests OFF)
 set(run_traceability OFF)
 
-if ((NOT TARGET azure_c_build_tools) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/azure-c-build-tools/CMakeLists.txt))
-    add_subdirectory(deps/azure-c-build-tools)
+if ((NOT TARGET c_build_tools) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/c-build-tools/CMakeLists.txt))
+    add_subdirectory(deps/c-build-tools)
     set_default_build_options()
 endif() 
 
-if ((NOT TARGET azure_macro_utils_c) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/azure-macro-utils-c/CMakeLists.txt))
-    add_subdirectory(deps/azure-macro-utils-c)
+if ((NOT TARGET macro_utils_c) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/macro-utils-c/CMakeLists.txt))
+    add_subdirectory(deps/macro-utils-c)
     include_directories(${MACRO_UTILS_INC_FOLDER})
 endif() 
 

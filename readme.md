@@ -2,15 +2,15 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 # testrunnerswitcher
 
-testrunnerswitcher is a simple library to switch test runners between azure-ctest (available at https://github.com/Azure/azure-ctest.git) and CppUnitTest.
+testrunnerswitcher is a simple library to switch test runners between ctest (available at https://github.com/Azure/ctest.git) and CppUnitTest.
 
 ## Setup
 
-- Clone azure-c-testrunnerswitcher by:
+- Clone c-testrunnerswitcher by:
 ```
-git clone --recursive https://github.com/Azure/azure-c-testrunnerswitcher.git
+git clone --recursive https://github.com/Azure/c-testrunnerswitcher.git
 ```
-- Create a cmake folder under azure-c-testrunnerswitcher
+- Create a cmake folder under c-testrunnerswitcher
 - Switch to the cmake folder and run
    cmake ..
 - Build the code for your platform (msbuild for Windows, make for Linux, etc.)

@@ -23,7 +23,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
 include (CTest)
 
-option(run_valgrind "set run_valgrind to ON if tests are to be run under valgrind/helgrind/drd. Default is OFF" OFF)
 option(use_installed_dependencies "set use_installed_dependencies to ON to use installed packages instead of building dependencies from submodules" OFF)
 
 #bring in dependencies

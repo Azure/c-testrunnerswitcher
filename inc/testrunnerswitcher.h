@@ -30,7 +30,7 @@ typedef void* TEST_MUTEX_HANDLE;
 
 #ifdef USE_CTEST
 
-#include "ctest.h"
+#include "ctest.h" // IWYU pragma: export
 
 #define BEGIN_TEST_SUITE(name)          CTEST_BEGIN_TEST_SUITE(name)
 #define END_TEST_SUITE(name)            CTEST_END_TEST_SUITE(name)

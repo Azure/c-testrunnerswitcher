@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 2.8.11)
 #if ((NOT TARGET testrunnerswitcher) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/c-testrunnerswitcher/CMakeLists.txt))
 #    add_subdirectory(deps/c-testrunnerswitcher)
 #    include_directories(${TESTRUNNERSWITCHER_INC_FOLDER})
-#endif() 
+#endif()
 
 if(TARGET testrunnerswitcher)
     RETURN()
@@ -42,12 +42,12 @@ set(run_traceability OFF)
 if ((NOT TARGET c_build_tools) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/c-build-tools/CMakeLists.txt))
     add_subdirectory(deps/c-build-tools)
     set_default_build_options()
-endif() 
+endif()
 
 if ((NOT TARGET macro_utils_c) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/macro-utils-c/CMakeLists.txt))
     add_subdirectory(deps/macro-utils-c)
     include_directories(${MACRO_UTILS_INC_FOLDER})
-endif() 
+endif()
 
 set(run_e2e_tests ${original_run_e2e_tests})
 set(run_int_tests ${original_run_int_tests})
@@ -55,16 +55,21 @@ set(run_perf_tests ${original_run_perf_tests})
 set(run_unittests ${original_run_unittests})
 set(run_traceability ${original_run_traceability})
 
-
 set(testrunnerswitcher_c_files
-./src/testmutex.c
-./src/ctrs_sprintf.c
+    ./src/ctrs_sprintf.c
 )
 
+if (WIN32)
+    set(testrunnerswitcher_c_files
+        ./src/testmutex.c
+        ${testrunnerswitcher_c_files}
+    )
+endif()
+
 set(testrunnerswitcher_h_files
-./inc/testrunnerswitcher.h
-./inc/ctrs_sprintf.h
-./inc/testmutex.h
+    ./inc/testrunnerswitcher.h
+    ./inc/ctrs_sprintf.h
+    ./inc/testmutex.h
 )
 
 add_library(testrunnerswitcher ${testrunnerswitcher_c_files} ${testrunnerswitcher_h_files})
@@ -77,7 +82,7 @@ target_include_directories(testrunnerswitcher
 
 set_target_properties(testrunnerswitcher
                PROPERTIES
-               FOLDER "test_tools") 
+               FOLDER "test_tools")
 
 #these are the include folders
 #the following "set" statetement exports across the project a global variable called TESTRUNNERSWITCHER_INC_FOLDER that expands to whatever needs to included when using tesrtrunnerswitcher library

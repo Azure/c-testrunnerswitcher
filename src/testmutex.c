@@ -4,8 +4,6 @@
 #include <stddef.h>
 #include "testmutex.h"
 
-#ifdef _MSC_VER
-
 #include "windows.h"
 
 TEST_MUTEX_HANDLE testmutex_create(void)
@@ -27,11 +25,3 @@ int testmutex_release(TEST_MUTEX_HANDLE mutex)
 {   
     return ReleaseMutex(mutex);
 }
-#else
-
-// XCode complains about a library with no exported functions
-extern void dummy_function_to_silence_compiler_is_never_called()
-{
-}
-
-#endif /* _MSC_VER */

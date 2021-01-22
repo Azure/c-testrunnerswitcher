@@ -55,11 +55,16 @@ set(run_perf_tests ${original_run_perf_tests})
 set(run_unittests ${original_run_unittests})
 set(run_traceability ${original_run_traceability})
 
-
 set(testrunnerswitcher_c_files
-./src/testmutex.c
 ./src/ctrs_sprintf.c
 )
+
+if (WIN32)
+    set(testrunnerswitcher_c_files
+        ./src/testmutex.c
+        ${testrunnerswitcher_c_files}
+    )
+endif()
 
 set(testrunnerswitcher_h_files
 ./inc/testrunnerswitcher.h

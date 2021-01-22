@@ -13,7 +13,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
-
+#include <wchar.h>
 #endif
 
 #ifdef MBED_BUILD_TIMESTAMP

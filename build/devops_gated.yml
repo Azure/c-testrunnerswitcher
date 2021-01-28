@@ -8,6 +8,7 @@ jobs:
   pool:
     name: Azure-MessagingStore
     demands:
+    - Build
     - Cmd
     - msbuild
     - visualstudio
@@ -64,6 +65,7 @@ jobs:
   pool:
     name: Azure-MessagingStore
     demands:
+    - Build
     - Cmd
     - msbuild
     - visualstudio
@@ -121,6 +123,7 @@ jobs:
   pool:
     name: Azure-MessagingStore
     demands:
+    - Build
     - Cmd
     - msbuild
     - visualstudio

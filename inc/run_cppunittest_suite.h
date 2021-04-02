@@ -3,6 +3,7 @@
 
 #include "macro_utils/macro_utils.h"
 #include "ctest.h"
+#include "cppunittest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

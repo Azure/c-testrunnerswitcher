@@ -70,8 +70,10 @@ endif()
 
 set(testrunnerswitcher_h_files
     ./inc/testrunnerswitcher.h
+    ./inc/ctest_2_cppunittest.h
     ./inc/ctrs_sprintf.h
     ./inc/testmutex.h
+    ./inc/run_cppunittest_suite.h
 )
 
 add_library(testrunnerswitcher ${testrunnerswitcher_c_files} ${testrunnerswitcher_h_files})

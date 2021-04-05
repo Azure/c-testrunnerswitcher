@@ -140,3 +140,5 @@ install(
         ${package_location}
 )
 
+add_subdirectory(build_functions)
+add_subdirectory(test_projects)

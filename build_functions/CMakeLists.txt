@@ -108,7 +108,7 @@ function(build_exe whatIsBuilding solution_folder)
 
     #this is the exe run by ctest (or directly from visual studio)
     add_executable(${whatIsBuilding}_exe
-        ${trw_internal_dir}/main_ctest.c
+        main.c
     )
 
     #link with the common lib (exe an dll share the lib part)

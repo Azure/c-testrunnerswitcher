@@ -15,7 +15,6 @@ extern "C" {
 #endif
 #endif /*CPPUNITTEST_SYMBOL*/
 
-#include "ctest_2_cppunittest.h"
 #include "testrunnerswitcher.h"
 
 #ifdef CPP_UNITTEST

@@ -4,6 +4,8 @@
 #ifndef CTEST_2_CPPUNITTEST_H
 #define CTEST_2_CPPUNITTEST_H
 
+#ifdef CPP_UNITTEST
+
 #include "macro_utils/macro_utils.h"
 
 #ifdef __cplusplus
@@ -93,6 +95,8 @@ __declspec(dllexport) CTEST_2_CPPUNITTEST_MemberMethodInfo* __stdcall MU_C2(GetT
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif /* CTEST_2_CPPUNITTEST_H */

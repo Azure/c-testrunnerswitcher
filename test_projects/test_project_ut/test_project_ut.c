@@ -15,4 +15,8 @@ extern "C" {
 #endif
 #endif /*CPPUNITTEST_SYMBOL*/
 
-const int dummy = 1;
+#include "testrunnerswitcher.h"
+
+BEGIN_TEST_SUITE(test_project_ut)
+
+END_TEST_SUITE(test_project_ut)

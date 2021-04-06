@@ -1,0 +1,18 @@
+{
+   <Suppress printf Helgrind>
+   Helgrind:Race
+   ...
+   fun:consolelogger_log
+}
+{
+   <Suppress printf DRD>
+   drd:ConflictingAccess
+   ...
+   fun:consolelogger_log
+}
+{
+   <Suppress interlocked_add DRD>
+   drd:ConflictingAccess
+   ...
+   fun:InterlockedHL_WaitForValue
+}

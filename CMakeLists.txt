@@ -25,7 +25,11 @@ set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
 include (CTest)
 
+option(run_unittests "set run_unittests to ON to run unittests (default is OFF)" OFF)
+option(run_int_tests "set run_int_tests to ON to run the integration tests (default is OFF)" OFF)
+option(run_perf_tests "set run_perf_tests to ON to build performance tests (default is OFF)." OFF)
 option(use_installed_dependencies "set use_installed_dependencies to ON to use installed packages instead of building dependencies from submodules" OFF)
+option(use_cppunittest "set use_cppunittest to ON to build CppUnitTest tests on Windows (default is OFF)" OFF)
 
 #bring in dependencies
 #do not add or build any tests of the dependencies
@@ -51,6 +55,16 @@ if ((NOT TARGET macro_utils_c) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/macro-
     include_directories(${MACRO_UTILS_INC_FOLDER})
 endif()
 
+if ((NOT TARGET c_logging) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/c-logging/CMakeLists.txt))
+    add_subdirectory(deps/c-logging)
+    include_directories(deps/c-logging/inc)
+endif() 
+
+if ((NOT TARGET ctest) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/ctest/CMakeLists.txt))
+    add_subdirectory(deps/ctest)
+    include_directories(${CTEST_INC_FOLDER})
+endif() 
+
 set(run_e2e_tests ${original_run_e2e_tests})
 set(run_int_tests ${original_run_int_tests})
 set(run_perf_tests ${original_run_perf_tests})
@@ -70,8 +84,10 @@ endif()
 
 set(testrunnerswitcher_h_files
     ./inc/testrunnerswitcher.h
+    ./inc/ctest_2_cppunittest.h
     ./inc/ctrs_sprintf.h
     ./inc/testmutex.h
+    ./inc/run_cppunittest_suite.h
 )
 
 add_library(testrunnerswitcher ${testrunnerswitcher_c_files} ${testrunnerswitcher_h_files})
@@ -138,3 +154,5 @@ install(
         ${package_location}
 )
 
+add_subdirectory(build_functions)
+add_subdirectory(test_projects)

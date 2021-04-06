@@ -15,3 +15,4 @@ extern "C" {
 #endif
 #endif /*CPPUNITTEST_SYMBOL*/
 
+const int dummy = 1;

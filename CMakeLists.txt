@@ -55,6 +55,11 @@ if ((NOT TARGET macro_utils_c) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/macro-
     include_directories(${MACRO_UTILS_INC_FOLDER})
 endif()
 
+if ((NOT TARGET ctest) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/ctest/CMakeLists.txt))
+    add_subdirectory(deps/ctest)
+    include_directories(${CTEST_INC_FOLDER})
+endif() 
+
 set(run_e2e_tests ${original_run_e2e_tests})
 set(run_int_tests ${original_run_int_tests})
 set(run_perf_tests ${original_run_perf_tests})

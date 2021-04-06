@@ -6,44 +6,47 @@
 
 #include "macro_utils/macro_utils.h"
 
-// This structure matches 100% the structure used by CppUnitTest to store its metadata in the shared section where the metadata is stored
-typedef struct CTEST_2_CPPUNITTEST_MethodMetadata_TAG
-{
-    const wchar_t* tag;
-    const wchar_t* methodName;
-    const unsigned char* helpMethodName;
-    const unsigned char* helpMethodDecoratedName;
-    const wchar_t* sourceFile;
-    int lineNo;
-} CTEST_2_CPPUNITTEST_MethodMetadata;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-typedef struct CTEST_2_CPPUNITTEST_MemberMethodInfo_TAG
-{
-    enum CTEST_2_CPPUNITTEST_MemberMethodTypes
+    // This structure matches 100% the structure used by CppUnitTest to store its metadata in the shared section where the metadata is stored
+    typedef struct CTEST_2_CPPUNITTEST_MethodMetadata_TAG
     {
-        TestMethod,
-        TestMethodSetup,
-        TestMethodCleanup,
-        TestObjectSetup,
-        TestObjectCleanup,
-        TestClassSetup,
-        TestClassCleanup,
-    } methodType;
-    union
+        const wchar_t* tag;
+        const wchar_t* methodName;
+        const unsigned char* helpMethodName;
+        const unsigned char* helpMethodDecoratedName;
+        const wchar_t* sourceFile;
+        int lineNo;
+    } CTEST_2_CPPUNITTEST_MethodMetadata;
+
+    typedef struct CTEST_2_CPPUNITTEST_MemberMethodInfo_TAG
     {
-        void* pVoidMethod;
-        void* pVoidStaticMethod;
-    } method;
+        enum CTEST_2_CPPUNITTEST_MemberMethodTypes
+        {
+            TestMethod,
+            TestMethodSetup,
+            TestMethodCleanup,
+            TestObjectSetup,
+            TestObjectCleanup,
+            TestClassSetup,
+            TestClassCleanup,
+        } methodType;
+        union
+        {
+            void* pVoidMethod;
+            void* pVoidStaticMethod;
+        } method;
 
-    const CTEST_2_CPPUNITTEST_MethodMetadata* metadata;
-} CTEST_2_CPPUNITTEST_MemberMethodInfo;
+        const CTEST_2_CPPUNITTEST_MethodMetadata* metadata;
+    } CTEST_2_CPPUNITTEST_MemberMethodInfo;
 
-// copied from CppUnitTest, do not have a better solution at the moment
+    // copied from CppUnitTest, do not have a better solution at the moment
 #define ALLOCATE_TESTDATA_SECTION_VERSION __declspec(allocate("testvers$"))
 #define ALLOCATE_TESTDATA_SECTION_CLASS __declspec(allocate("testdata$_A_class"))
 #define ALLOCATE_TESTDATA_SECTION_METHOD __declspec(allocate("testdata$_B_method"))
 #define ALLOCATE_TESTDATA_SECTION_ATTRIBUTE __declspec(allocate("testdata$_C_attribute"))
-#define ALLOCATE_TESTDATA_SECTION_DAN __declspec(allocate("testdata$_dan"))
 
 // unfortunately we have to create the sections before using them
 // this code is also taken from CppUnitTest.h
@@ -51,7 +54,6 @@ typedef struct CTEST_2_CPPUNITTEST_MemberMethodInfo_TAG
 #pragma section("testdata$_A_class", read, shared)
 #pragma section("testdata$_B_method", read, shared)
 #pragma section("testdata$_C_attribute", read, shared)
-#pragma section("testdata$_dan", read, shared)
 
 // The reader of the metadata really really wants to have in the helperMethodName the class to which the "methods" belong
 // Based on reverse engineering the code at https://devdiv.visualstudio.com/DevDiv/_git/VS?path=%2Fsrc%2Fvset%2FAgile%2FCppUnit%2FDiscoverer%2FTestMetaDataReaderForLatestVersion.cs&_a=contents&version=GBmain
@@ -88,5 +90,9 @@ __declspec(dllexport) CTEST_2_CPPUNITTEST_MemberMethodInfo* __stdcall MU_C2(GetT
     s_Info.method.pVoidStaticMethod = (void*)func_name; \
     return &s_Info; \
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CTEST_2_CPPUNITTEST_H */

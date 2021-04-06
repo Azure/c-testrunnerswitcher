@@ -8,10 +8,12 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 #define RUN_TESTS_WITH_CPP_UNITTEST(test_suite) \
+    /* These externs are needed to force linking the current unit */ \
     extern C_LINKAGE const TEST_FUNCTION_DATA MU_C2(TestListHead_, test_suite); \
     static const TEST_FUNCTION_DATA* entry_test_function_data = &MU_C2(TestListHead_, test_suite); \
     TEST_CLASS(DummyTestClass) \
     { \
+        /* For some obscure reason, using IMPLEMENT_CPP_UNIT_FIXTURE here does not work, so we'll just hand craft it */ \
         static const EXPORT_METHOD::Microsoft::VisualStudio::CppUnitTestFramework::TestClassInfo* CALLING_CONVENTION MU_C2(GetTestClassInfo_, test_suite)() \
         { \
             ALLOCATE_TESTDATA_SECTION_CLASS static const ::Microsoft::VisualStudio::CppUnitTestFramework::ClassMetadata CppUnitTestClassMetadata = { L"TestClassInfo", reinterpret_cast<const unsigned char*>(__FUNCTION__), reinterpret_cast<const unsigned char*>(__FUNCDNAME__) }; \

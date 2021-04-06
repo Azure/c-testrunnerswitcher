@@ -1,7 +1,7 @@
 #Copyright (c) Microsoft. All rights reserved.
 #Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-set(trw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
+set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
 function(build_lib whatIsBuilding solution_folder)
 
@@ -20,6 +20,9 @@ function(build_lib whatIsBuilding solution_folder)
            FOLDER ${solution_folder})
 
     target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DUSE_CTEST)
+    if(${use_cppunittest})
+        target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DCPP_UNITTEST)
+    endif()
     target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
 
     set(PARSING_ADDITIONAL_LIBS OFF)
@@ -63,7 +66,7 @@ function(build_dll whatIsBuilding solution_folder)
 
     #this is the .dll run by visual studio's test runner
     add_library(${whatIsBuilding}_dll SHARED
-        ${trw_internal_dir}/main_cpp_unittest.cpp
+        ${trsw_internal_dir}/main_cpp_unittest.cpp
     )
 
     #link with the common lib (exe an dll share the lib part)
@@ -73,6 +76,9 @@ function(build_dll whatIsBuilding solution_folder)
 
     target_include_directories(${whatIsBuilding}_dll PUBLIC ${sharedutil_include_directories} $ENV{VCInstallDir}auxiliary/vs/unittest/include $ENV{VCInstallDir}unittest/include)
     target_compile_definitions(${whatIsBuilding}_dll PUBLIC -DCPP_UNITTEST)
+    if(${use_cppunittest})
+        target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DCPP_UNITTEST)
+    endif()
     target_compile_definitions(${whatIsBuilding}_dll PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
     target_compile_options(${whatIsBuilding}_dll PUBLIC /EHsc)
 
@@ -121,6 +127,9 @@ function(build_exe whatIsBuilding solution_folder)
     set_output_folder_properties(${whatIsBuilding}_exe)
 
     target_compile_definitions(${whatIsBuilding}_exe PUBLIC -DUSE_CTEST)
+    if(${use_cppunittest})
+        target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DCPP_UNITTEST)
+    endif()
     target_compile_definitions(${whatIsBuilding}_exe PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
     target_include_directories(${whatIsBuilding}_exe PUBLIC ${sharedutil_include_directories})
 
@@ -147,13 +156,13 @@ function(build_exe whatIsBuilding solution_folder)
                 message(WARNING "Running with run_valgrind/run_helgrind/run_drd, but valgrind was not found - there will be no tests run under valgrind")
             else()
                 if(${run_valgrind})
-                    add_test(NAME ${whatIsBuilding}_valgrind COMMAND valgrind                 --gen-suppressions=all --num-callers=100 --error-exitcode=1 --leak-check=full --track-origins=yes ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_exe>)
+                    add_test(NAME ${whatIsBuilding}_valgrind COMMAND valgrind                 --gen-suppressions=all --num-callers=100 --error-exitcode=1 --leak-check=full --track-origins=yes ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trsw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_exe>)
                 endif()
                 if(${run_helgrind})
-                    add_test(NAME ${whatIsBuilding}_helgrind COMMAND valgrind --tool=helgrind --gen-suppressions=all --num-callers=100 --error-exitcode=1 ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_exe>)
+                    add_test(NAME ${whatIsBuilding}_helgrind COMMAND valgrind --tool=helgrind --gen-suppressions=all --num-callers=100 --error-exitcode=1 ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trsw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_exe>)
                 endif()
                 if(${run_drd})
-                    add_test(NAME ${whatIsBuilding}_drd      COMMAND valgrind --tool=drd      --gen-suppressions=all --num-callers=100 --error-exitcode=1 ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_exe>)
+                    add_test(NAME ${whatIsBuilding}_drd      COMMAND valgrind --tool=drd      --gen-suppressions=all --num-callers=100 --error-exitcode=1 ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trsw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_exe>)
                 endif()
             endif()
         endif()

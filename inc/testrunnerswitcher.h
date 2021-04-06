@@ -30,6 +30,11 @@ typedef void* TEST_MUTEX_HANDLE;
 
 #ifdef USE_CTEST
 
+// if both are defined do not forget to include the ctest to cpp unit test
+#ifdef CPP_UNITTEST
+#include "ctest_2_cppunittest.h"
+#endif
+
 #include "ctest.h" // IWYU pragma: export
 
 #define BEGIN_TEST_SUITE(name)          CTEST_BEGIN_TEST_SUITE(name)

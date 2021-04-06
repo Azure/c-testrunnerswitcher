@@ -15,13 +15,18 @@ extern "C" {
 #endif
 #endif /*CPPUNITTEST_SYMBOL*/
 
+#include "ctest_2_cppunittest.h"
 #include "testrunnerswitcher.h"
 
-BEGIN_TEST_SUITE(test_project_ut)
+#ifdef CPP_UNITTEST
+#include "cppunittest.h"
+using namespace ::Microsoft::VisualStudio::CppUnitTestFramework;
 
-TEST_FUNCTION(a)
-{
+// these 2 variable definitions check that the size of the structures in ctest and cppunittest are the same
+static int compile_time_check_CTEST_2_CPPUNITTEST_MethodMetadata_size[sizeof(CTEST_2_CPPUNITTEST_MethodMetadata) == sizeof(MethodMetadata) ? 1 : 0];
+static int compile_time_check_CTEST_2_CPPUNITTEST_MemberMethodInfo_size[sizeof(CTEST_2_CPPUNITTEST_MemberMethodInfo) == sizeof(MemberMethodInfo) ? 1 : 0];
+#endif
 
-}
+BEGIN_TEST_SUITE(ctest_2_cppunittest_ut)
 
-END_TEST_SUITE(test_project_ut)
+END_TEST_SUITE(ctest_2_cppunittest_ut)

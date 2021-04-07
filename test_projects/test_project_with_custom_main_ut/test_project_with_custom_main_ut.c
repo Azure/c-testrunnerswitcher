@@ -19,9 +19,9 @@ extern "C" {
 
 BEGIN_TEST_SUITE(test_project_with_custom_main_ut)
 
-TEST_FUNCTION(a)
+TEST_FUNCTION(never_executed)
 {
-
+    ASSERT_FAIL("This should never get executed");
 }
 
 END_TEST_SUITE(test_project_with_custom_main_ut)

@@ -57,7 +57,7 @@ function(build_lib whatIsBuilding solution_folder)
     endforeach()
 endfunction()
 
-function(build_dll whatIsBuilding solution_folder)
+function(build_dll whatIsBuilding solution_folder custom_main)
 
     #lazily build _lib which is needed by both exe and dll
     if(NOT TARGET ${whatIsBuilding}_lib)
@@ -65,9 +65,16 @@ function(build_dll whatIsBuilding solution_folder)
     endif()
 
     #this is the .dll run by visual studio's test runner
-    add_library(${whatIsBuilding}_dll SHARED
-        ${trsw_internal_dir}/main_cpp_unittest.cpp
-    )
+    if(${custom_main})
+        add_library(${whatIsBuilding}_dll SHARED
+            main_cpp_unittest.cpp
+        )
+    else()
+        # use the stock boilerplate main.c
+        add_library(${whatIsBuilding}_dll SHARED
+            ${trsw_internal_dir}/main_cpp_unittest.cpp
+        )
+    endif()
 
     #link with the common lib (exe an dll share the lib part)
     target_link_libraries(${whatIsBuilding}_dll ${whatIsBuilding}_lib)
@@ -223,7 +230,7 @@ function(build_test_artifacts whatIsBuilding use_gballoc solution_folder )
     if(${building} STREQUAL "lib")
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
     elseif(${building} STREQUAL "dll")
-        build_dll(${whatIsBuilding} ${solution_folder} ${ARGN})
+        build_dll(${whatIsBuilding} ${solution_folder} OFF ${ARGN})
     elseif(${building} STREQUAL "exe")
         build_exe(${whatIsBuilding} ${solution_folder} OFF ${ARGN})
     else()
@@ -243,7 +250,7 @@ function(build_test_artifacts_with_custom_main whatIsBuilding use_gballoc soluti
     if(${building} STREQUAL "lib")
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
     elseif(${building} STREQUAL "dll")
-        build_dll(${whatIsBuilding} ${solution_folder} ${ARGN})
+        build_dll(${whatIsBuilding} ${solution_folder} ON ${ARGN})
     elseif(${building} STREQUAL "exe")
         build_exe(${whatIsBuilding} ${solution_folder} ON ${ARGN})
     else()

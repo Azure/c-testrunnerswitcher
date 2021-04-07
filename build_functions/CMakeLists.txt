@@ -57,7 +57,7 @@ function(build_lib whatIsBuilding solution_folder)
     endforeach()
 endfunction()
 
-function(build_dll whatIsBuilding solution_folder)
+function(build_dll whatIsBuilding solution_folder custom_main)
 
     #lazily build _lib which is needed by both exe and dll
     if(NOT TARGET ${whatIsBuilding}_lib)
@@ -65,9 +65,16 @@ function(build_dll whatIsBuilding solution_folder)
     endif()
 
     #this is the .dll run by visual studio's test runner
-    add_library(${whatIsBuilding}_dll SHARED
-        ${trsw_internal_dir}/main_cpp_unittest.cpp
-    )
+    if(${custom_main})
+        add_library(${whatIsBuilding}_dll SHARED
+            main_cpp_unittest.cpp
+        )
+    else()
+        # use the stock boilerplate main.c
+        add_library(${whatIsBuilding}_dll SHARED
+            ${trsw_internal_dir}/main_cpp_unittest.cpp
+        )
+    endif()
 
     #link with the common lib (exe an dll share the lib part)
     target_link_libraries(${whatIsBuilding}_dll ${whatIsBuilding}_lib)
@@ -105,7 +112,7 @@ function(build_dll whatIsBuilding solution_folder)
     copy_disable_vld_ini(${whatIsBuilding}_dll $<TARGET_FILE_DIR:${whatIsBuilding}_dll>)
 endfunction()
 
-function(build_exe whatIsBuilding solution_folder)
+function(build_exe whatIsBuilding solution_folder custom_main)
 
     #lazily build _lib which is needed by both exe and dll
     if(NOT TARGET ${whatIsBuilding}_lib)
@@ -113,9 +120,16 @@ function(build_exe whatIsBuilding solution_folder)
     endif()
 
     #this is the exe run by ctest (or directly from visual studio)
-    add_executable(${whatIsBuilding}_exe
-        main.c
-    )
+    if(${custom_main})
+        add_executable(${whatIsBuilding}_exe
+            main.c
+        )
+    else()
+        # use the stock boilerplate main.c
+        add_executable(${whatIsBuilding}_exe
+            ${trsw_internal_dir}/main_ctest.c
+        )
+    endif()
 
     #link with the common lib (exe an dll share the lib part)
     target_link_libraries(${whatIsBuilding}_exe ${whatIsBuilding}_lib)
@@ -216,9 +230,29 @@ function(build_test_artifacts whatIsBuilding use_gballoc solution_folder )
     if(${building} STREQUAL "lib")
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
     elseif(${building} STREQUAL "dll")
-        build_dll(${whatIsBuilding} ${solution_folder} ${ARGN})
+        build_dll(${whatIsBuilding} ${solution_folder} OFF ${ARGN})
     elseif(${building} STREQUAL "exe")
-        build_exe(${whatIsBuilding} ${solution_folder} ${ARGN})
+        build_exe(${whatIsBuilding} ${solution_folder} OFF ${ARGN})
+    else()
+        MESSAGE(FATAL_ERROR "not an expected value: building=${building} test_folder=${test_folder} ARGN=${ARGN}")
+    endif()
+endfunction()
+
+#this is the function used to add all the needed targets for one test project where main.c is custom
+#(invoked from the CMakeLists where the test suite lives)
+# Note: the test folder has to be added by using build_test_folder, not add_subdirectory!
+# Note: main.c is expected to live in the test folder
+function(build_test_artifacts_with_custom_main whatIsBuilding use_gballoc solution_folder )
+    if(${use_gballoc})
+        add_definitions(-DGB_MEASURE_MEMORY_FOR_THIS -DGB_DEBUG_ALLOC)
+    endif()
+
+    if(${building} STREQUAL "lib")
+        build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
+    elseif(${building} STREQUAL "dll")
+        build_dll(${whatIsBuilding} ${solution_folder} ON ${ARGN})
+    elseif(${building} STREQUAL "exe")
+        build_exe(${whatIsBuilding} ${solution_folder} ON ${ARGN})
     else()
         MESSAGE(FATAL_ERROR "not an expected value: building=${building} test_folder=${test_folder} ARGN=${ARGN}")
     endif()

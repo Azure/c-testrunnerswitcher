@@ -23,18 +23,20 @@ extern "C" {
         int lineNo;
     } CTEST_2_CPPUNITTEST_MethodMetadata;
 
+    typedef enum CTEST_2_CPPUNITTEST_MemberMethodTypes_TAG
+    {
+        TestMethod,
+        TestMethodSetup,
+        TestMethodCleanup,
+        TestObjectSetup,
+        TestObjectCleanup,
+        TestClassSetup,
+        TestClassCleanup,
+    } CTEST_2_CPPUNITTEST_MemberMethodTypes;
+
     typedef struct CTEST_2_CPPUNITTEST_MemberMethodInfo_TAG
     {
-        enum CTEST_2_CPPUNITTEST_MemberMethodTypes
-        {
-            TestMethod,
-            TestMethodSetup,
-            TestMethodCleanup,
-            TestObjectSetup,
-            TestObjectCleanup,
-            TestClassSetup,
-            TestClassCleanup,
-        } methodType;
+        CTEST_2_CPPUNITTEST_MemberMethodTypes methodType;
         union
         {
             void* pVoidMethod;

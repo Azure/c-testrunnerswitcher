@@ -3,7 +3,7 @@
 
 #include "macro_utils/macro_utils.h"
 #include "ctest.h"
-#include "cppunittest.h"
+#include "CppUnitTest.h" // IWYU pragma: export
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

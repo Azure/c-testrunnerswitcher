@@ -61,40 +61,6 @@ typedef void* TEST_MUTEX_HANDLE;
 #define TEST_MUTEX_RELEASE(mutex)
 #define TEST_MUTEX_DESTROY(mutex)
 
-// This code belongs in ctest, there is an issue files to move it there:
-// https://github.com/Azure/azure-c-testrunnerswitcher/issues/32
-#define TEST_ENUM_TYPE_HANDLER(EnumName, ...) \
-static const wchar_t *EnumName##_Strings[]= \
-{ \
-__VA_ARGS__ \
-}; \
-static void EnumName##_ToString(char* dest, size_t bufferSize, EnumName enumValue)                                                  \
-{                                                                                                                                   \
-    if(((int)enumValue>=0) && (int)enumValue<(int)(sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])))                       \
-    {                                                                                                                               \
-        (void)snprintf(dest, bufferSize, "%ls", EnumName##_Strings[enumValue]);                                                     \
-    }                                                                                                                               \
-    else                                                                                                                            \
-    {                                                                                                                               \
-        (void)snprintf(dest, bufferSize, "%d is out of bounds value for " MU_TOSTRING(EnumName), enumValue);                       \
-    }                                                                                                                               \
-}                                                                                                                                   \
-static bool EnumName##_Compare(EnumName left, EnumName right) \
-{ \
-    return left != right; \
-}
-
-#define TEST_ENUM_2_TYPE_HANDLER(EnumName, ...) \
-static void EnumName##_ToString(char* dest, size_t bufferSize, EnumName enumValue) \
-{ \
-    const char* enum_string = MU_ENUM_TO_STRING_2(EnumName, enumValue); \
-    (void)snprintf(dest, bufferSize, "%s", enum_string); \
-} \
-static bool EnumName##_Compare(EnumName left, EnumName right) \
-{ \
-    return left != right; \
-}
-
 #elif defined CPP_UNITTEST
 
 #ifdef _MSC_VER
@@ -104,9 +70,7 @@ static bool EnumName##_Compare(EnumName left, EnumName right) \
 #include "CppUnitTest.h"
 #include "testmutex.h"
 #include "ctrs_sprintf.h"
-
-#define TEST_DEFINE_ENUM_TYPE(type, ...)
-#define TEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type, ...)
+#include "ctest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -211,34 +175,68 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
 #define TEST_MUTEX_RELEASE(mutex)                           testmutex_release(mutex)
 #define TEST_MUTEX_DESTROY(mutex)                           testmutex_destroy(mutex)
 
-#define TEST_ENUM_TYPE_HANDLER(EnumName, ...) \
+#define TEST_USE_CTEST_FUNCTIONS_FOR_TYPE(my_type) \
 namespace Microsoft \
 { \
     namespace VisualStudio \
     { \
         namespace CppUnitTestFramework \
         { \
-            static const wchar_t *EnumName##_Strings[]= \
+            template<> \
+            inline std::wstring ToString<my_type>(const my_type& value) \
             { \
-                __VA_ARGS__ \
-            }; \
-            template <> std::wstring ToString < EnumName > (const EnumName & q)  \
-            {  \
-                if((q<0)||(size_t)q>=sizeof(EnumName##_Strings)/sizeof(EnumName##_Strings[0])) \
+                char temp_str[1024]; \
+                std::wstring result; \
+                if (MU_C2(my_type,_ToString)(temp_str, sizeof(temp_str), value) != 0) \
                 { \
-                    return(L"out of range value for " #EnumName); \
+                    return L""; \
                 } \
                 else \
                 { \
-                    return EnumName##_Strings[q]; \
+                    int size_needed_in_chars = MultiByteToWideChar(CP_UTF8, 0, &temp_str[0], -1, NULL, 0); \
+                    if (size_needed_in_chars == 0) \
+                    { \
+                        result = L""; \
+                    } \
+                    else \
+                    { \
+                        WCHAR* widechar_string = (WCHAR*)malloc(size_needed_in_chars * sizeof(WCHAR)); \
+                        if (widechar_string == NULL) \
+                        { \
+                            result = L""; \
+                        } \
+                        else \
+                        { \
+                            if (MultiByteToWideChar(CP_UTF8, 0, temp_str, -1, widechar_string, size_needed_in_chars) == 0) \
+                            { \
+                                result = L""; \
+                            } \
+                            else \
+                            { \
+                                result = std::wstring(widechar_string); \
+                            } \
+                            free(widechar_string); \
+                        } \
+                    } \
                 } \
+                return result; \
+            } \
+            template<> \
+            static void Assert::AreEqual<my_type>(const my_type& expected, const my_type& actual, const wchar_t* message, const __LineInfo* pLineInfo) \
+            { \
+                FailOnCondition((MU_C2(my_type,_Compare)(expected, actual) == 0), EQUALS_MESSAGE(expected, actual, message), pLineInfo); \
             } \
         } \
     } \
-};
+} \
 
-#define TEST_ENUM_2_TYPE_HANDLER(EnumName, ...) \
-    TEST_ENUM_TYPE_HANDLER(EnumName, __VA_ARGS__)
+#define TEST_DEFINE_ENUM_TYPE(type, ...) \
+    CTEST_DEFINE_ENUM_TYPE(type) \
+    TEST_USE_CTEST_FUNCTIONS_FOR_TYPE(type)
+
+#define TEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type, ...) \
+    CTEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type) \
+    TEST_USE_CTEST_FUNCTIONS_FOR_TYPE(type)
 
 /*because for some reason this is not defined by Visual Studio, it is defined here, so it is not multiplied in every single other unittest*/
 namespace Microsoft

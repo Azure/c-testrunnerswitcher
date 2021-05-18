@@ -22,13 +22,10 @@
 
 typedef void* TEST_MUTEX_HANDLE;
 
-#define USE_ONLY_ENUM_NAMES(count, enum_value_name, enum_value_value) enum_value_name MU_IF_COMMA(count)
-#define DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING(x, y) MU_C2(L, MU_TOSTRING(x)) ,
-
-#define TEST_DEFINE_ENUM_TYPE(type, ...) TEST_ENUM_TYPE_HANDLER(type, MU_FOR_EACH_1(MU_DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING, __VA_ARGS__));
-#define TEST_DEFINE_ENUM_2_TYPE(type, ...) TEST_ENUM_2_TYPE_HANDLER(type, MU_FOR_EACH_2(DEFINE_ENUMERATION_CONSTANT_AS_WIDESTRING, __VA_ARGS__));
-
 #ifdef USE_CTEST
+
+#define TEST_DEFINE_ENUM_TYPE(type, ...) CTEST_DEFINE_ENUM_TYPE(type, __VA_ARGS__)
+#define TEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type, ...) CTEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type, __VA_ARGS__)
 
 // if both are defined do not forget to include the ctest to cpp unit test
 #ifdef CPP_UNITTEST
@@ -98,8 +95,6 @@ static bool EnumName##_Compare(EnumName left, EnumName right) \
     return left != right; \
 }
 
-#define TEST_USE_CTEST_FUNCTIONS_FOR_TYPE(my_type)
-
 #elif defined CPP_UNITTEST
 
 #ifdef _MSC_VER
@@ -109,6 +104,9 @@ static bool EnumName##_Compare(EnumName left, EnumName right) \
 #include "CppUnitTest.h"
 #include "testmutex.h"
 #include "ctrs_sprintf.h"
+
+#define TEST_DEFINE_ENUM_TYPE(type, ...)
+#define TEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type, ...)
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -241,61 +239,6 @@ namespace Microsoft \
 
 #define TEST_ENUM_2_TYPE_HANDLER(EnumName, ...) \
     TEST_ENUM_TYPE_HANDLER(EnumName, __VA_ARGS__)
-
-#define TEST_USE_CTEST_FUNCTIONS_FOR_TYPE(my_type) \
-namespace Microsoft \
-{ \
-    namespace VisualStudio \
-    { \
-        namespace CppUnitTestFramework \
-        { \
-            template<> \
-            inline std::wstring ToString<my_type>(const my_type& value) \
-            { \
-                char temp_str[1024]; \
-                std::wstring result; \
-                if (MU_C2(my_type,_ToString)(temp_str, sizeof(temp_str), value) != 0) \
-                { \
-                    return L""; \
-                } \
-                else \
-                { \
-                    int size_needed_in_chars = MultiByteToWideChar(CP_UTF8, 0, &temp_str[0], -1, NULL, 0); \
-                    if (size_needed_in_chars == 0) \
-                    { \
-                        result = L""; \
-                    } \
-                    else \
-                    { \
-                        WCHAR* widechar_string = (WCHAR*)malloc(size_needed_in_chars * sizeof(WCHAR)); \
-                        if (widechar_string == NULL) \
-                        { \
-                            result = L""; \
-                        } \
-                        else \
-                        { \
-                            if (MultiByteToWideChar(CP_UTF8, 0, temp_str, -1, widechar_string, size_needed_in_chars) == 0) \
-                            { \
-                                result = L""; \
-                            } \
-                            else \
-                            { \
-                                result = std::wstring(widechar_string); \
-                            } \
-                            free(widechar_string); \
-                        } \
-                    } \
-                } \
-                return result; \
-            } \
-            template<> \
-            static void Assert::AreEqual<my_type>(const my_type& expected, const my_type& actual, const wchar_t* message, const __LineInfo* pLineInfo) \
-            { \
-                FailOnCondition((MU_C2(my_type,_Compare)(expected, actual) == 0), EQUALS_MESSAGE(expected, actual, message), pLineInfo); \
-            } \
-        } \
-    } \
-} \
 
 /*because for some reason this is not defined by Visual Studio, it is defined here, so it is not multiplied in every single other unittest*/
 namespace Microsoft

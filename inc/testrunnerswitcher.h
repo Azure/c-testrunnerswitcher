@@ -187,36 +187,30 @@ namespace Microsoft \
             { \
                 char temp_str[1024]; \
                 std::wstring result; \
-                if (MU_C2(my_type,_ToString)(temp_str, sizeof(temp_str), value) != 0) \
+                MU_C2(my_type,_ToString)(temp_str, sizeof(temp_str), value); \
+                int size_needed_in_chars = MultiByteToWideChar(CP_UTF8, 0, &temp_str[0], -1, NULL, 0); \
+                if (size_needed_in_chars == 0) \
                 { \
-                    return L""; \
+                    result = L""; \
                 } \
                 else \
                 { \
-                    int size_needed_in_chars = MultiByteToWideChar(CP_UTF8, 0, &temp_str[0], -1, NULL, 0); \
-                    if (size_needed_in_chars == 0) \
+                    WCHAR* widechar_string = (WCHAR*)malloc(size_needed_in_chars * sizeof(WCHAR)); \
+                    if (widechar_string == NULL) \
                     { \
                         result = L""; \
                     } \
                     else \
                     { \
-                        WCHAR* widechar_string = (WCHAR*)malloc(size_needed_in_chars * sizeof(WCHAR)); \
-                        if (widechar_string == NULL) \
+                        if (MultiByteToWideChar(CP_UTF8, 0, temp_str, -1, widechar_string, size_needed_in_chars) == 0) \
                         { \
                             result = L""; \
                         } \
                         else \
                         { \
-                            if (MultiByteToWideChar(CP_UTF8, 0, temp_str, -1, widechar_string, size_needed_in_chars) == 0) \
-                            { \
-                                result = L""; \
-                            } \
-                            else \
-                            { \
-                                result = std::wstring(widechar_string); \
-                            } \
-                            free(widechar_string); \
+                            result = std::wstring(widechar_string); \
                         } \
+                        free(widechar_string); \
                     } \
                 } \
                 return result; \
@@ -231,11 +225,11 @@ namespace Microsoft \
 } \
 
 #define TEST_DEFINE_ENUM_TYPE(type, ...) \
-    CTEST_DEFINE_ENUM_TYPE(type) \
+    CTEST_DEFINE_ENUM_TYPE(type, __VA_ARGS__) \
     TEST_USE_CTEST_FUNCTIONS_FOR_TYPE(type)
 
 #define TEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type, ...) \
-    CTEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type) \
+    CTEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type, __VA_ARGS__) \
     TEST_USE_CTEST_FUNCTIONS_FOR_TYPE(type)
 
 /*because for some reason this is not defined by Visual Studio, it is defined here, so it is not multiplied in every single other unittest*/

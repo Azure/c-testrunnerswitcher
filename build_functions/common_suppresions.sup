@@ -16,3 +16,8 @@
    ...
    fun:InterlockedHL_WaitForValue
 }
+{
+   <Suppress ToString Helgrind (this should be moved at some point to a specific suppression file in macro utils)>
+   Helgrind:Race
+   fun:MU_*_ToString
+}

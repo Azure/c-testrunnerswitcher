@@ -17,11 +17,7 @@
    fun:InterlockedHL_WaitForValue
 }
 {
-   <Suppress ToString Helgrind (this should be moved at some point to a specific suppression file in macro utils)>
-   <both macro-utils and ctest define a _ToString function for enums>
-   <macro-utils' is called MU_ENUMNAME_ToString>
-   <CTest's is ENUMNAME_ToString>
-   <so *_ToString will cover both cases>
+   <Suppress ToString Helgrind (this should be moved at some point to a specific suppression file in macro utils). Both macro-utils and ctest define a _ToString function for enums. Nacro-utils' is called MU_ENUMNAME_ToString. CTest's is ENUMNAME_ToString. So *_ToString will cover both cases>
    Helgrind:Race
    fun:*_ToString
 }

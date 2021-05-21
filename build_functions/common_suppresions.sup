@@ -24,5 +24,7 @@
    # CTest's is ENUMNAME_ToString. 
    # So *_ToString will cover both cases
    Helgrind:Race
+   ...
    fun:*_ToString
+   ...
 }

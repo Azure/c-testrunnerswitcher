@@ -74,8 +74,8 @@ typedef void* TEST_MUTEX_HANDLE;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-typedef const char* char_ptr;
-typedef const wchar_t* wchar_ptr;
+typedef char* char_ptr;
+typedef wchar_t* wchar_ptr;
 typedef void* void_ptr;
 
 #ifdef CPPUNITTEST_SYMBOL

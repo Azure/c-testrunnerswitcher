@@ -13,4 +13,4 @@ set(${theseTestsName}_c_files
 set(${theseTestsName}_h_files
 )
 
-build_test_artifacts(${theseTestsName} ON "tests/c_testrunnerswitcher")
+build_test_artifacts(${theseTestsName} "tests/c_testrunnerswitcher")

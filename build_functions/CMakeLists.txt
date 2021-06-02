@@ -222,11 +222,7 @@ endfunction()
 #this is the function used to add all the needed targets for one test project
 #(invoked from the CMakeLists where the test suite lives)
 # Note: the test folder has to be added by using build_test_folder, not add_subdirectory!
-function(build_test_artifacts whatIsBuilding use_gballoc solution_folder )
-    if(${use_gballoc})
-        add_definitions(-DGB_MEASURE_MEMORY_FOR_THIS -DGB_DEBUG_ALLOC)
-    endif()
-
+function(build_test_artifacts whatIsBuilding solution_folder)
     if(${building} STREQUAL "lib")
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
     elseif(${building} STREQUAL "dll")
@@ -242,11 +238,7 @@ endfunction()
 #(invoked from the CMakeLists where the test suite lives)
 # Note: the test folder has to be added by using build_test_folder, not add_subdirectory!
 # Note: main.c is expected to live in the test folder
-function(build_test_artifacts_with_custom_main whatIsBuilding use_gballoc solution_folder )
-    if(${use_gballoc})
-        add_definitions(-DGB_MEASURE_MEMORY_FOR_THIS -DGB_DEBUG_ALLOC)
-    endif()
-
+function(build_test_artifacts_with_custom_main whatIsBuilding solution_folder )
     if(${building} STREQUAL "lib")
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
     elseif(${building} STREQUAL "dll")

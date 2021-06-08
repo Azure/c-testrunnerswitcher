@@ -4,15 +4,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+
+#include "c_logging/xlogging.h"
+
 #include "ctrs_sprintf.h"
 
 static char* ctrs_vsprintf_char(const char* format, va_list va)
 {
     char* result;
+    va_list va_clone;
+    va_copy(va_clone, va); /*passing "va" to vsnprintf twice is undefined behavior, so "va" is passed and then "va_clone"*/
     int neededSize = vsnprintf(NULL, 0, format, va);
     if (neededSize < 0)
     {
-        (void)printf("failure in vsnprintf\n");
+        LogError("failure in vsnprintf(NULL, 0, format=%s, va=%p)", format, (void*)va);
         result = NULL;
     }
     else
@@ -20,19 +25,20 @@ static char* ctrs_vsprintf_char(const char* format, va_list va)
         result = malloc(neededSize + 1);
         if (result == NULL)
         {
-            (void)printf("failure in malloc\n");
+            LogError("failure in malloc(neededSize=%zu + 1);", neededSize);
             /*return as is*/
         }
         else
         {
-            if (vsnprintf(result, neededSize + 1, format, va) != neededSize)
+            if (vsnprintf(result, neededSize + 1, format, va_clone) != neededSize)
             {
-                (void)printf("inconsistent vsnprintf behavior\n");
+                LogError("failure in vsnprintf(result, neededSize=%zu + 1, format=%s, va_clone=%p) va=%p ", neededSize, format, (void*)va_clone, (void*)va);
                 free(result);
                 result = NULL;
             }
         }
     }
+    va_end(va_clone);
     return result;
 }
 

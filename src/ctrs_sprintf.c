@@ -25,14 +25,14 @@ static char* ctrs_vsprintf_char(const char* format, va_list va)
         result = malloc(neededSize + 1);
         if (result == NULL)
         {
-            LogError("failure in malloc(neededSize=%zu + 1);", neededSize);
+            LogError("failure in malloc(neededSize=%d + 1);", neededSize);
             /*return as is*/
         }
         else
         {
             if (vsnprintf(result, neededSize + 1, format, va_clone) != neededSize)
             {
-                LogError("failure in vsnprintf(result, neededSize=%zu + 1, format=%s, va_clone=%p) va=%p ", neededSize, format, (void*)va_clone, (void*)va);
+                LogError("failure in vsnprintf(result, neededSize=%d + 1, format=%s, va_clone=%p) va=%p ", neededSize, format, (void*)va_clone, (void*)va);
                 free(result);
                 result = NULL;
             }

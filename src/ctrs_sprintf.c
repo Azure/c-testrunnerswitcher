@@ -17,7 +17,7 @@ static char* ctrs_vsprintf_char(const char* format, va_list va)
     int neededSize = vsnprintf(NULL, 0, format, va);
     if (neededSize < 0)
     {
-        LogError("failure in vsnprintf(NULL, 0, format=%s, va=%p)", format, (void*)va);
+        LogError("failure in vsnprintf(NULL, 0, format=%s, va=%p)", format, (void*)&va);
         result = NULL;
     }
     else
@@ -32,7 +32,7 @@ static char* ctrs_vsprintf_char(const char* format, va_list va)
         {
             if (vsnprintf(result, neededSize + 1, format, va_clone) != neededSize)
             {
-                LogError("failure in vsnprintf(result, neededSize=%d + 1, format=%s, va_clone=%p) va=%p ", neededSize, format, (void*)va_clone, (void*)va);
+                LogError("failure in vsnprintf(result, neededSize=%d + 1, format=%s, va_clone=%p) va=%p ", neededSize, format, (void*)&va_clone, (void*)&va);
                 free(result);
                 result = NULL;
             }

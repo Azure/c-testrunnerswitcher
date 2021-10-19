@@ -156,3 +156,7 @@ install(
 
 add_subdirectory(build_functions)
 add_subdirectory(test_projects)
+
+if(${run_reals_check})
+    add_reals_check_target()
+endif()

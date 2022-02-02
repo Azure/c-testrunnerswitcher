@@ -3,7 +3,7 @@
 
 set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
-function(build_lib whatIsBuilding solution_folder)
+function(build_lib_internal whatIsBuilding solution_folder force_c)
 
     add_library(${whatIsBuilding}_lib
         ${${whatIsBuilding}_c_files}
@@ -12,8 +12,10 @@ function(build_lib whatIsBuilding solution_folder)
         ${${whatIsBuilding}_test_files}
     )
 
-    #make sure to compile the test file as C!
-    set_source_files_properties(${${whatIsBuilding}_test_files} PROPERTIES LANGUAGE C)
+    if(${force_c})
+        #make sure to compile the test file as C!
+        set_source_files_properties(${${whatIsBuilding}_test_files} PROPERTIES LANGUAGE C)
+    endif()
 
     set_target_properties(${whatIsBuilding}_lib
            PROPERTIES
@@ -57,11 +59,19 @@ function(build_lib whatIsBuilding solution_folder)
     endforeach()
 endfunction()
 
-function(build_dll whatIsBuilding solution_folder custom_main)
+function(build_lib whatIsBuilding solution_folder)
+    build_lib_internal(${whatIsBuilding} ${solution_folder} ON ${ARGN})
+endfunction()
+
+function(build_lib_cxx whatIsBuilding solution_folder)
+    build_lib_internal(${whatIsBuilding} ${solution_folder} OFF ${ARGN})
+endfunction()
+
+function(build_dll_internal whatIsBuilding solution_folder custom_main force_c)
 
     #lazily build _lib which is needed by both exe and dll
     if(NOT TARGET ${whatIsBuilding}_lib)
-        build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
+        build_lib_internal(${whatIsBuilding} ${solution_folder} ${force_c} ${ARGN})
     endif()
 
     #this is the .dll run by visual studio's test runner
@@ -112,8 +122,15 @@ function(build_dll whatIsBuilding solution_folder custom_main)
     copy_disable_vld_ini(${whatIsBuilding}_dll $<TARGET_FILE_DIR:${whatIsBuilding}_dll>)
 endfunction()
 
-function(build_exe whatIsBuilding solution_folder custom_main)
+function(build_dll whatIsBuilding solution_folder custom_main)
+    build_dll_internal(${whatIsBuilding} ${solution_folder} ${custom_main} ON ${ARGN})
+endfunction()
 
+function(build_dll_cxx whatIsBuilding solution_folder custom_main)
+    build_dll_internal(${whatIsBuilding} ${solution_folder} ${custom_main} OFF ${ARGN})
+endfunction()
+
+function(build_exe_internal whatIsBuilding solution_folder custom_main force_c)
     #lazily build _lib which is needed by both exe and dll
     if(NOT TARGET ${whatIsBuilding}_lib)
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
@@ -183,6 +200,14 @@ function(build_exe whatIsBuilding solution_folder custom_main)
     endif()
 endfunction()
 
+function(build_exe whatIsBuilding solution_folder custom_main)
+    build_exe_internal(${whatIsBuilding} ${solution_folder} ${custom_main} ON ${ARGN})
+endfunction()
+
+function(build_exe_cxx whatIsBuilding solution_folder custom_main)
+    build_exe_internal(${whatIsBuilding} ${solution_folder} ${custom_main} OFF ${ARGN})
+endfunction()
+
 #drop in replacement for add_subdirectory :)
 function(build_test_folder test_folder)
 
@@ -216,22 +241,25 @@ function(build_test_folder test_folder)
     else()
         #message("test_folder is ${test_folder} NOT BUILDING")
     endif()
+endfunction()
 
+function(build_test_artifacts_internal whatIsBuilding solution_folder custom_main force_c)
+    if(${building} STREQUAL "lib")
+        build_lib_internal(${whatIsBuilding} ${solution_folder} ${force_c} ${ARGN})
+    elseif(${building} STREQUAL "dll")
+        build_dll_internal(${whatIsBuilding} ${solution_folder} ${custom_main} ${force_c} ${ARGN})
+    elseif(${building} STREQUAL "exe")
+        build_exe_internal(${whatIsBuilding} ${solution_folder} ${custom_main} ${force_c} ${ARGN})
+    else()
+        MESSAGE(FATAL_ERROR "not an expected value: building=${building} test_folder=${test_folder} ARGN=${ARGN}")
+    endif()
 endfunction()
 
 #this is the function used to add all the needed targets for one test project
 #(invoked from the CMakeLists where the test suite lives)
 # Note: the test folder has to be added by using build_test_folder, not add_subdirectory!
 function(build_test_artifacts whatIsBuilding solution_folder)
-    if(${building} STREQUAL "lib")
-        build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
-    elseif(${building} STREQUAL "dll")
-        build_dll(${whatIsBuilding} ${solution_folder} OFF ${ARGN})
-    elseif(${building} STREQUAL "exe")
-        build_exe(${whatIsBuilding} ${solution_folder} OFF ${ARGN})
-    else()
-        MESSAGE(FATAL_ERROR "not an expected value: building=${building} test_folder=${test_folder} ARGN=${ARGN}")
-    endif()
+    build_test_artifacts_internal(whatIsBuilding solution_folder OFF ON)
 endfunction()
 
 #this is the function used to add all the needed targets for one test project where main.c is custom
@@ -239,13 +267,15 @@ endfunction()
 # Note: the test folder has to be added by using build_test_folder, not add_subdirectory!
 # Note: main.c is expected to live in the test folder
 function(build_test_artifacts_with_custom_main whatIsBuilding solution_folder )
-    if(${building} STREQUAL "lib")
-        build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
-    elseif(${building} STREQUAL "dll")
-        build_dll(${whatIsBuilding} ${solution_folder} ON ${ARGN})
-    elseif(${building} STREQUAL "exe")
-        build_exe(${whatIsBuilding} ${solution_folder} ON ${ARGN})
-    else()
-        MESSAGE(FATAL_ERROR "not an expected value: building=${building} test_folder=${test_folder} ARGN=${ARGN}")
-    endif()
+    build_test_artifacts_internal(whatIsBuilding solution_folder ON ON)
+endfunction()
+
+# Same as above but allows the test to be C++ (rather than forcing it to compile as C)
+function(build_test_artifacts_cxx whatIsBuilding solution_folder)
+    build_test_artifacts_internal(whatIsBuilding solution_folder OFF OFF)
+endfunction()
+
+# Same as above but allows the test to be C++ (rather than forcing it to compile as C)
+function(build_test_artifacts_with_custom_main_cxx whatIsBuilding solution_folder )
+    build_test_artifacts_internal(whatIsBuilding solution_folder ON OFF)
 endfunction()

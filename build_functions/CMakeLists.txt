@@ -259,7 +259,7 @@ endfunction()
 #(invoked from the CMakeLists where the test suite lives)
 # Note: the test folder has to be added by using build_test_folder, not add_subdirectory!
 function(build_test_artifacts whatIsBuilding solution_folder)
-    build_test_artifacts_internal(whatIsBuilding solution_folder OFF ON)
+    build_test_artifacts_internal(${whatIsBuilding} ${solution_folder} OFF ON)
 endfunction()
 
 #this is the function used to add all the needed targets for one test project where main.c is custom
@@ -267,15 +267,15 @@ endfunction()
 # Note: the test folder has to be added by using build_test_folder, not add_subdirectory!
 # Note: main.c is expected to live in the test folder
 function(build_test_artifacts_with_custom_main whatIsBuilding solution_folder )
-    build_test_artifacts_internal(whatIsBuilding solution_folder ON ON)
+    build_test_artifacts_internal(${whatIsBuilding} ${solution_folder} ON ON)
 endfunction()
 
 # Same as above but allows the test to be C++ (rather than forcing it to compile as C)
 function(build_test_artifacts_cxx whatIsBuilding solution_folder)
-    build_test_artifacts_internal(whatIsBuilding solution_folder OFF OFF)
+    build_test_artifacts_internal(${whatIsBuilding} ${solution_folder} OFF OFF)
 endfunction()
 
 # Same as above but allows the test to be C++ (rather than forcing it to compile as C)
 function(build_test_artifacts_with_custom_main_cxx whatIsBuilding solution_folder )
-    build_test_artifacts_internal(whatIsBuilding solution_folder ON OFF)
+    build_test_artifacts_internal(${whatIsBuilding} ${solution_folder} ON OFF)
 endfunction()

@@ -133,7 +133,7 @@ endfunction()
 function(build_exe_internal whatIsBuilding solution_folder custom_main force_c)
     #lazily build _lib which is needed by both exe and dll
     if(NOT TARGET ${whatIsBuilding}_lib)
-        build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
+        build_lib_internal(${whatIsBuilding} ${solution_folder} ${force_c} ${ARGN})
     endif()
 
     #this is the exe run by ctest (or directly from visual studio)

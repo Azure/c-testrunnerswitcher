@@ -5,7 +5,7 @@ set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
 function(build_lib whatIsBuilding solution_folder)
 
-    add_library(${whatIsBuilding}_lib
+    add_library(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib
         ${${whatIsBuilding}_c_files}
         ${${whatIsBuilding}_h_files}
         ${${whatIsBuilding}_cpp_files}
@@ -15,15 +15,15 @@ function(build_lib whatIsBuilding solution_folder)
     #make sure to compile the test file as C!
     set_source_files_properties(${${whatIsBuilding}_test_files} PROPERTIES LANGUAGE C)
 
-    set_target_properties(${whatIsBuilding}_lib
+    set_target_properties(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib
            PROPERTIES
            FOLDER ${solution_folder})
 
-    target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DUSE_CTEST)
+    target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib PUBLIC -DUSE_CTEST)
     if(${use_cppunittest})
-        target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DCPP_UNITTEST)
+        target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib PUBLIC -DCPP_UNITTEST)
     endif()
-    target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
+    target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
 
     set(PARSING_ADDITIONAL_LIBS OFF)
     set(PARSING_VALGRIND_SUPPRESSIONS_FILE OFF)
@@ -48,7 +48,7 @@ function(build_lib whatIsBuilding solution_folder)
                 if((${f} STREQUAL "debug") OR (${f} STREQUAL "optimized") OR (${f} STREQUAL "general"))
                     SET(ARG_PREFIX ${f})
                 else()
-                    target_link_libraries_with_arg_prefix(${ARG_PREFIX} ${whatIsBuilding}_lib ${f})
+                    target_link_libraries_with_arg_prefix(${ARG_PREFIX} ${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib ${f})
                     set(ARG_PREFIX "none")
                 endif()
             endif()
@@ -60,108 +60,108 @@ endfunction()
 function(build_dll whatIsBuilding solution_folder custom_main)
 
     #lazily build _lib which is needed by both exe and dll
-    if(NOT TARGET ${whatIsBuilding}_lib)
+    if(NOT TARGET ${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib)
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
     endif()
 
     #this is the .dll run by visual studio's test runner
     if(${custom_main})
-        add_library(${whatIsBuilding}_dll SHARED
+        add_library(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll SHARED
             main_cpp_unittest.cpp
         )
     else()
         # use the stock boilerplate main.c
-        add_library(${whatIsBuilding}_dll SHARED
+        add_library(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll SHARED
             ${trsw_internal_dir}/main_cpp_unittest.cpp
         )
     endif()
 
     #link with the common lib (exe an dll share the lib part)
-    target_link_libraries(${whatIsBuilding}_dll ${whatIsBuilding}_lib)
+    target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll ${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib)
 
-    target_link_directories(${whatIsBuilding}_dll PRIVATE $ENV{VCInstallDir}auxiliary/vs/unittest/lib $ENV{VCInstallDir}unittest/lib)
+    target_link_directories(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll PRIVATE $ENV{VCInstallDir}auxiliary/vs/unittest/lib $ENV{VCInstallDir}unittest/lib)
 
-    target_include_directories(${whatIsBuilding}_dll PUBLIC ${sharedutil_include_directories} $ENV{VCInstallDir}auxiliary/vs/unittest/include $ENV{VCInstallDir}unittest/include)
-    target_compile_definitions(${whatIsBuilding}_dll PUBLIC -DCPP_UNITTEST)
+    target_include_directories(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll PUBLIC ${sharedutil_include_directories} $ENV{VCInstallDir}auxiliary/vs/unittest/include $ENV{VCInstallDir}unittest/include)
+    target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll PUBLIC -DCPP_UNITTEST)
     if(${use_cppunittest})
-        target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DCPP_UNITTEST)
+        target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib PUBLIC -DCPP_UNITTEST)
     endif()
-    target_compile_definitions(${whatIsBuilding}_dll PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
-    target_compile_options(${whatIsBuilding}_dll PUBLIC /EHsc)
+    target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
+    target_compile_options(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll PUBLIC /EHsc)
 
-    set_target_properties(${whatIsBuilding}_dll
+    set_target_properties(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll
                PROPERTIES
                FOLDER ${solution_folder})
 
-    target_compile_definitions(${whatIsBuilding}_dll PUBLIC -DUSE_CTEST)
-    set_output_folder_properties(${whatIsBuilding}_dll)
+    target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll PUBLIC -DUSE_CTEST)
+    set_output_folder_properties(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll)
 
     if (TARGET c_logging)
-        target_link_libraries(${whatIsBuilding}_dll c_logging)
+        target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll c_logging)
     endif()
     if (TARGET umock_c)
-        target_link_libraries(${whatIsBuilding}_dll umock_c)
+        target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll umock_c)
     endif()
     if (TARGET ctest)
-        target_link_libraries(${whatIsBuilding}_dll ctest)
+        target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll ctest)
     endif()
     if (TARGET testrunnerswitcher)
-        target_link_libraries(${whatIsBuilding}_dll testrunnerswitcher)
+        target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll testrunnerswitcher)
     endif()
 
-    copy_disable_vld_ini(${whatIsBuilding}_dll $<TARGET_FILE_DIR:${whatIsBuilding}_dll>)
+    copy_disable_vld_ini(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll $<TARGET_FILE_DIR:${whatIsBuilding}_${CMAKE_PROJECT_NAME}_dll>)
 endfunction()
 
 function(build_exe whatIsBuilding solution_folder custom_main)
 
     #lazily build _lib which is needed by both exe and dll
-    if(NOT TARGET ${whatIsBuilding}_lib)
+    if(NOT TARGET ${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib)
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
     endif()
 
     #this is the exe run by ctest (or directly from visual studio)
     if(${custom_main})
-        add_executable(${whatIsBuilding}_exe
+        add_executable(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe
             main.c
         )
     else()
         # use the stock boilerplate main.c
-        add_executable(${whatIsBuilding}_exe
+        add_executable(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe
             ${trsw_internal_dir}/main_ctest.c
         )
     endif()
 
     #link with the common lib (exe an dll share the lib part)
-    target_link_libraries(${whatIsBuilding}_exe ${whatIsBuilding}_lib)
+    target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe ${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib)
 
-    set_target_properties(${whatIsBuilding}_exe
+    set_target_properties(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe
                PROPERTIES
                FOLDER ${solution_folder})
 
-    set_output_folder_properties(${whatIsBuilding}_exe)
+    set_output_folder_properties(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe)
 
-    target_compile_definitions(${whatIsBuilding}_exe PUBLIC -DUSE_CTEST)
+    target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe PUBLIC -DUSE_CTEST)
     if(${use_cppunittest})
-        target_compile_definitions(${whatIsBuilding}_lib PUBLIC -DCPP_UNITTEST)
+        target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_lib PUBLIC -DCPP_UNITTEST)
     endif()
-    target_compile_definitions(${whatIsBuilding}_exe PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
-    target_include_directories(${whatIsBuilding}_exe PUBLIC ${sharedutil_include_directories})
+    target_compile_definitions(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
+    target_include_directories(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe PUBLIC ${sharedutil_include_directories})
 
     if (TARGET c_logging)
-        target_link_libraries(${whatIsBuilding}_exe c_logging)
+        target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe c_logging)
     endif()
     if (TARGET umock_c)
-        target_link_libraries(${whatIsBuilding}_exe umock_c)
+        target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe umock_c)
     endif()
     if (TARGET ctest)
-        target_link_libraries(${whatIsBuilding}_exe ctest)
+        target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe ctest)
     endif()
     if (TARGET testrunnerswitcher)
-        target_link_libraries(${whatIsBuilding}_exe testrunnerswitcher)
+        target_link_libraries(${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe testrunnerswitcher)
     endif()
 
     #register the exe with ctest's list of tests
-    add_test(NAME ${whatIsBuilding} COMMAND ${whatIsBuilding}_exe)
+    add_test(NAME ${whatIsBuilding} COMMAND ${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe)
 
     if(UNIX) #LINUX OR APPLE
         if(${run_valgrind} OR ${run_helgrind} OR ${run_drd})
@@ -170,13 +170,13 @@ function(build_exe whatIsBuilding solution_folder custom_main)
                 message(WARNING "Running with run_valgrind/run_helgrind/run_drd, but valgrind was not found - there will be no tests run under valgrind")
             else()
                 if(${run_valgrind})
-                    add_test(NAME ${whatIsBuilding}_valgrind COMMAND valgrind                 --gen-suppressions=all --num-callers=100 --error-exitcode=1 --leak-check=full --track-origins=yes ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trsw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_exe>)
+                    add_test(NAME ${whatIsBuilding}_valgrind COMMAND valgrind                 --gen-suppressions=all --num-callers=100 --error-exitcode=1 --leak-check=full --track-origins=yes ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trsw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe>)
                 endif()
                 if(${run_helgrind})
-                    add_test(NAME ${whatIsBuilding}_helgrind COMMAND valgrind --tool=helgrind --gen-suppressions=all --num-callers=100 --error-exitcode=1 ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trsw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_exe>)
+                    add_test(NAME ${whatIsBuilding}_helgrind COMMAND valgrind --tool=helgrind --gen-suppressions=all --num-callers=100 --error-exitcode=1 ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trsw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe>)
                 endif()
                 if(${run_drd})
-                    add_test(NAME ${whatIsBuilding}_drd      COMMAND valgrind --tool=drd      --gen-suppressions=all --num-callers=100 --error-exitcode=1 ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trsw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_exe>)
+                    add_test(NAME ${whatIsBuilding}_drd      COMMAND valgrind --tool=drd      --gen-suppressions=all --num-callers=100 --error-exitcode=1 ${VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER} --suppressions=${trsw_internal_dir}/common_suppresions.sup $<TARGET_FILE:${whatIsBuilding}_${CMAKE_PROJECT_NAME}_exe>)
                 endif()
             endif()
         endif()

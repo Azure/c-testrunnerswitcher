@@ -112,51 +112,6 @@ set(TESTRUNNERSWITCHER_INC_FOLDER ${CMAKE_CURRENT_LIST_DIR}/inc CACHE INTERNAL "
 
 include_directories(${TESTRUNNERSWITCHER_INC_FOLDER})
 
-# Set CMAKE_INSTALL_* if not defined
-include(GNUInstallDirs)
-
-if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
-    set(CMAKE_INSTALL_LIBDIR "lib")
-endif()
-
-# Install Azure Test Runner Switcher
-set(package_location "cmake")
-
-install (TARGETS testrunnerswitcher EXPORT testrunnerswitcherTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/../bin
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-install (FILES ${testrunnerswitcher_h_files} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-include(CMakePackageConfigHelpers)
-
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake"
-    VERSION ${TESTRUNNER_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
-configure_file("configs/${PROJECT_NAME}Config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake"
-    COPYONLY
-)
-
-install(EXPORT testrunnerswitcherTargets
-    FILE
-        "${PROJECT_NAME}Targets.cmake"
-    DESTINATION
-        ${package_location}
-)
-install(
-    FILES
-        "configs/${PROJECT_NAME}Config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake"
-    DESTINATION
-        ${package_location}
-)
 
 add_subdirectory(build_functions)
 add_subdirectory(test_projects)

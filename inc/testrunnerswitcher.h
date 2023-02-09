@@ -16,10 +16,6 @@
 #include <wchar.h>
 #endif
 
-#ifdef MBED_BUILD_TIMESTAMP
-#define USE_CTEST
-#endif
-
 typedef void* TEST_MUTEX_HANDLE;
 
 #ifdef USE_CTEST

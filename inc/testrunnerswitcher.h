@@ -16,6 +16,8 @@
 #include <wchar.h>
 #endif
 
+#include "cppunittest_mutex_fixtures.h"
+
 typedef void* TEST_MUTEX_HANDLE;
 
 #ifdef USE_CTEST
@@ -26,17 +28,25 @@ typedef void* TEST_MUTEX_HANDLE;
 // if both are defined do not forget to include the ctest to cpp unit test
 #ifdef CPP_UNITTEST
 #include "ctest_2_cppunittest.h"
+
+#define TEST_SUITE_INITIALIZE(name)     CTEST_SUITE_INITIALIZE(name, cppunittest_mutex_fixtures_suite_init)
+#define TEST_SUITE_CLEANUP(name)        CTEST_SUITE_CLEANUP(name, cppunittest_mutex_fixtures_suite_cleanup)
+#define TEST_FUNCTION_INITIALIZE(name)  CTEST_FUNCTION_INITIALIZE(name, cppunittest_mutex_fixtures_function_init)
+#define TEST_FUNCTION_CLEANUP(name)     CTEST_FUNCTION_CLEANUP(name, cppunittest_mutex_fixtures_function_cleanup)
+
+#else
+
+#define TEST_SUITE_INITIALIZE(name)     CTEST_SUITE_INITIALIZE(name)
+#define TEST_SUITE_CLEANUP(name)        CTEST_SUITE_CLEANUP(name)
+#define TEST_FUNCTION_INITIALIZE(name)  CTEST_FUNCTION_INITIALIZE(name)
+#define TEST_FUNCTION_CLEANUP(name)     CTEST_FUNCTION_CLEANUP(name)
+
 #endif
 
 #include "ctest.h" // IWYU pragma: export
 
 #define BEGIN_TEST_SUITE(name)          CTEST_BEGIN_TEST_SUITE(name)
 #define END_TEST_SUITE(name)            CTEST_END_TEST_SUITE(name)
-
-#define TEST_SUITE_INITIALIZE(name)     CTEST_SUITE_INITIALIZE(name)
-#define TEST_SUITE_CLEANUP(name)        CTEST_SUITE_CLEANUP(name)
-#define TEST_FUNCTION_INITIALIZE(name)  CTEST_FUNCTION_INITIALIZE(name)
-#define TEST_FUNCTION_CLEANUP(name)     CTEST_FUNCTION_CLEANUP(name)
 
 #define TEST_FUNCTION(name)             CTEST_FUNCTION(name)
 
@@ -243,10 +253,13 @@ namespace Microsoft
                 RETURN_WIDE_STRING(t);
             }
 #endif
+/*Visual Studio 2022 version 17.5.3 has in C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\VS\UnitTest\include\CppUnitTestAssert.h the same template*/
+#if _MSC_VER < 1935
             template<> inline std::wstring ToString<uint16_t>(const uint16_t& t)
             {
                 RETURN_WIDE_STRING(t);
             }
+#endif
         }
     }
 }

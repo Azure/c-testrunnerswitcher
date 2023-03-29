@@ -3,6 +3,7 @@
 
 // These fixtures are to be used only with CPPUNITTEST
 #define CPP_UNITTEST
+#define USE_CTEST
 
 #include "testrunnerswitcher.h"
 #include "testmutex.h"

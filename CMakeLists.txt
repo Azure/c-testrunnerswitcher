@@ -79,22 +79,31 @@ set(testrunnerswitcher_c_files
     ./src/ctrs_sprintf.c
 )
 
+set(testrunnerswitcher_cpp_files
+)
+
 if (WIN32)
     set(testrunnerswitcher_c_files
-        ./src/testmutex.c
         ${testrunnerswitcher_c_files}
+        ./src/testmutex.c
+    )
+
+    set(testrunnerswitcher_cpp_files
+        ${testrunnerswitcher_cpp_files}
+        ./src/cppunittest_mutex_fixtures.cpp
     )
 endif()
 
 set(testrunnerswitcher_h_files
     ./inc/testrunnerswitcher.h
+    ./inc/cppunittest_mutex_fixtures.h
     ./inc/ctest_2_cppunittest.h
     ./inc/ctrs_sprintf.h
     ./inc/testmutex.h
     ./inc/run_cppunittest_suite.h
 )
 
-add_library(testrunnerswitcher ${testrunnerswitcher_c_files} ${testrunnerswitcher_h_files})
+add_library(testrunnerswitcher ${testrunnerswitcher_c_files} ${testrunnerswitcher_cpp_files} ${testrunnerswitcher_h_files})
 
 target_include_directories(testrunnerswitcher
     PUBLIC

@@ -7,7 +7,7 @@
 #include "testrunnerswitcher.h"
 #include "testmutex.h"
 
-TEST_MUTEX_HANDLE g_cppunittest_serialize_mutex;
+static TEST_MUTEX_HANDLE g_cppunittest_serialize_mutex;
 
 void cppunittest_mutex_fixtures_suite_init(void)
 {

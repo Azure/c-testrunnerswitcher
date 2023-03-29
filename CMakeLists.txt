@@ -80,13 +80,17 @@ set(testrunnerswitcher_c_files
 )
 
 set(testrunnerswitcher_cpp_files
-    ./src/cppunittest_mutex_fixtures.cpp
 )
 
 if (WIN32)
     set(testrunnerswitcher_c_files
-        ./src/testmutex.c
         ${testrunnerswitcher_c_files}
+        ./src/testmutex.c
+    )
+
+    set(testrunnerswitcher_cpp_files
+        ${testrunnerswitcher_cpp_files}
+        ./src/cppunittest_mutex_fixtures.cpp
     )
 endif()
 

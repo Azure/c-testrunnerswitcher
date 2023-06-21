@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "c_logging/logger.h.h"
+#include "c_logging/logger.h"
 
 #include "testrunnerswitcher.h"
 

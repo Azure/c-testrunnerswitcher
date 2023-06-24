@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "macro_utils/macro_utils.h"
+
 #include "c_logging/logger.h"
 
 #include "ctrs_sprintf.h"

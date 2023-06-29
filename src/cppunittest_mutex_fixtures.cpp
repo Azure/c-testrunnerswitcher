@@ -8,16 +8,20 @@
 #include "testrunnerswitcher.h"
 #include "testmutex.h"
 
+#include "c_logging/logger.h"
+
 static TEST_MUTEX_HANDLE g_cppunittest_serialize_mutex;
 
 void cppunittest_mutex_fixtures_suite_init(void)
 {
+    ASSERT_ARE_EQUAL(int, 0, logger_init());
     ASSERT_IS_NOT_NULL(g_cppunittest_serialize_mutex = TEST_MUTEX_CREATE());
 }
 
 void cppunittest_mutex_fixtures_suite_cleanup(void)
 {
     TEST_MUTEX_DESTROY(g_cppunittest_serialize_mutex);
+    logger_deinit();
 }
 
 void cppunittest_mutex_fixtures_function_init(void)

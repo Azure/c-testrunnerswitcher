@@ -9,7 +9,6 @@ endif()
 
 #if ((NOT TARGET testrunnerswitcher) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/c-testrunnerswitcher/CMakeLists.txt))
 #    add_subdirectory(deps/c-testrunnerswitcher)
-#    include_directories(${TESTRUNNERSWITCHER_INC_FOLDER})
 #endif()
 
 if(TARGET testrunnerswitcher)
@@ -55,18 +54,16 @@ endif()
 
 if ((NOT TARGET macro_utils_c) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/macro-utils-c/CMakeLists.txt))
     add_subdirectory(deps/macro-utils-c)
-    include_directories(${MACRO_UTILS_INC_FOLDER})
 endif()
 
 if ((NOT TARGET c_logging) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/c-logging/CMakeLists.txt))
     add_subdirectory(deps/c-logging)
     include_directories(deps/c-logging/v2/inc)
-endif() 
+endif()
 
 if ((NOT TARGET ctest) AND (EXISTS ${CMAKE_CURRENT_LIST_DIR}/deps/ctest/CMakeLists.txt))
     add_subdirectory(deps/ctest)
-    include_directories(${CTEST_INC_FOLDER})
-endif() 
+endif()
 
 set(run_e2e_tests ${original_run_e2e_tests})
 set(run_int_tests ${original_run_int_tests})
@@ -77,9 +74,6 @@ set(run_reals_check ${original_run_reals_check})
 
 set(testrunnerswitcher_c_files
     ./src/ctrs_sprintf.c
-)
-
-set(testrunnerswitcher_cpp_files
 )
 
 if (WIN32)
@@ -110,17 +104,11 @@ target_include_directories(testrunnerswitcher
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/inc>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
+target_link_libraries(testrunnerswitcher c_logging_v2 ctest)
 
 set_target_properties(testrunnerswitcher
                PROPERTIES
                FOLDER "test_tools")
-
-#these are the include folders
-#the following "set" statetement exports across the project a global variable called TESTRUNNERSWITCHER_INC_FOLDER that expands to whatever needs to included when using tesrtrunnerswitcher library
-set(TESTRUNNERSWITCHER_INC_FOLDER ${CMAKE_CURRENT_LIST_DIR}/inc CACHE INTERNAL "this is what needs to be included if using testrunnerswitcher header" FORCE)
-
-include_directories(${TESTRUNNERSWITCHER_INC_FOLDER})
-
 
 add_subdirectory(build_functions)
 add_subdirectory(test_projects)

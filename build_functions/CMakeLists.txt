@@ -55,6 +55,20 @@ function(build_lib whatIsBuilding solution_folder)
         endif()
 
     endforeach()
+
+    if (TARGET c_logging_v2)
+        target_link_libraries(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} c_logging_v2)
+    endif()
+    if (TARGET umock_c)
+        target_link_libraries(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} umock_c)
+    endif()
+    if (TARGET ctest)
+        target_link_libraries(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} ctest)
+    endif()
+    if (TARGET testrunnerswitcher)
+        target_link_libraries(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} testrunnerswitcher)
+    endif()
+
 endfunction()
 
 function(build_dll whatIsBuilding solution_folder custom_main)

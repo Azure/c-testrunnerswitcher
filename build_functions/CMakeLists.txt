@@ -212,18 +212,22 @@ function(build_test_folder test_folder)
         set(oneValueArgs BINARY_DIR) #there's single value arg (maybe)
         set(multiValueArgs) #no multi value args
 
-        cmake_parse_arguments("" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"" means don't use any decoration for the variable names
+        cmake_parse_arguments("arg" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"" means don't use any decoration for the variable names
 
-        if(BINARY_DIR)
-            MESSAGE("DETECTED BINARY_DIR=${BINARY_DIR}")
+        foreach(f ${ARGN})
+            message("ARGN=${f}")
+        endforeach()
+
+        if(arg_BINARY_DIR)
+            MESSAGE("DETECTED arg_BINARY_DIR=${arg_BINARY_DIR}")
         endif()
 
         set(building exe)
-        add_subdirectory(${test_folder} ${test_folder}/${BINARY_DIR}/${building})
+        add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})
 
         if ((${use_cppunittest}) AND (WIN32))
             set(building dll)
-            add_subdirectory(${test_folder} ${test_folder}/${BINARY_DIR}/${building})
+            add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})
         endif()
     else()
         #message("test_folder is ${test_folder} NOT BUILDING")

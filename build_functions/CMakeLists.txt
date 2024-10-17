@@ -215,7 +215,7 @@ function(build_test_folder test_folder)
         cmake_parse_arguments("" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"" means don't use any decoration for the variable names
 
         if(BINARY_DIR)
-            MESSAGE("DETECTED BINARY_DIR=${arg_BINARY_DIR}")
+            MESSAGE("DETECTED BINARY_DIR=${BINARY_DIR}")
         endif()
 
         set(building exe)

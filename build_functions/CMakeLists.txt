@@ -36,11 +36,8 @@ function(build_lib whatIsBuilding solution_folder)
 
     cmake_parse_arguments("arg" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
 
-    message("ARGN was ${ARGN}")
-
     if(arg_ADDITIONAL_LIBS)
         set(ARG_PREFIX "none") #"none" results in a link without prefix (see debug, optimized, or general keywords in https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
-        message("arg_ADDITIONAL_LIBS was ${arg_ADDITIONAL_LIBS}")
         foreach(f ${arg_ADDITIONAL_LIBS})
             if((${f} STREQUAL "debug") OR (${f} STREQUAL "optimized") OR (${f} STREQUAL "general"))
                 SET(ARG_PREFIX ${f})
@@ -50,7 +47,7 @@ function(build_lib whatIsBuilding solution_folder)
             endif()
         endforeach()
     else()
-        #arg_ADDITIONAL_LIBS is not set therefore no need to do anything about other libraries
+        #arg_ADDITIONAL_LIBS is not set therefore no need to do anything about libraries
     endif()
 
 

@@ -212,7 +212,7 @@ function(build_test_folder test_folder)
         set(oneValueArgs BINARY_DIR) #there's single value arg (maybe)
         set(multiValueArgs) #no multi value args
 
-        cmake_parse_arguments("arg" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"" means don't use any decoration for the variable names
+        cmake_parse_arguments("arg" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
 
         set(building exe)
         add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})
@@ -232,21 +232,6 @@ endfunction()
 # Note: the test folder has to be added by using build_test_folder, not add_subdirectory!
 function(build_test_artifacts whatIsBuilding solution_folder)
     if(${building} STREQUAL "lib")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
     elseif(${building} STREQUAL "dll")
         build_dll(${whatIsBuilding} ${solution_folder} OFF ${ARGN})

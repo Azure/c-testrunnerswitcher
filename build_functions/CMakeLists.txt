@@ -198,6 +198,7 @@ function(build_exe whatIsBuilding solution_folder custom_main)
 endfunction()
 
 #drop in replacement for add_subdirectory :)
+#test_folder is the name of a folder that exists on the drive. For example "clds_hash_table_ut". It is not a complete path.
 function(build_test_folder test_folder)
 
     if(
@@ -211,18 +212,18 @@ function(build_test_folder test_folder)
         set(oneValueArgs BINARY_DIR) #there's single value arg (maybe)
         set(multiValueArgs) #no multi value args
 
-        cmake_parse_arguments(arg "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+        cmake_parse_arguments("" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"" means don't use any decoration for the variable names
 
-        if(arg_BINARY_DIR)
-            MESSAGE("DETECTED arg_BINARY_DIR=${arg_BINARY_DIR}")
+        if(BINARY_DIR)
+            MESSAGE("DETECTED BINARY_DIR=${arg_BINARY_DIR}")
         endif()
 
         set(building exe)
-        add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})
+        add_subdirectory(${test_folder} ${test_folder}/${BINARY_DIR}/${building})
 
         if ((${use_cppunittest}) AND (WIN32))
             set(building dll)
-            add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})
+            add_subdirectory(${test_folder} ${test_folder}/${BINARY_DIR}/${building})
         endif()
     else()
         #message("test_folder is ${test_folder} NOT BUILDING")
@@ -235,6 +236,21 @@ endfunction()
 # Note: the test folder has to be added by using build_test_folder, not add_subdirectory!
 function(build_test_artifacts whatIsBuilding solution_folder)
     if(${building} STREQUAL "lib")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        MESSAGE ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         build_lib(${whatIsBuilding} ${solution_folder} ${ARGN})
     elseif(${building} STREQUAL "dll")
         build_dll(${whatIsBuilding} ${solution_folder} OFF ${ARGN})

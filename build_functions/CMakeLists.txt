@@ -34,22 +34,27 @@ function(build_lib whatIsBuilding solution_folder)
     set(oneValueArgs) #no single value arg
     set(multiValueArgs ADDITIONAL_LIBS) # only ADDITIONAL_LIBS is a multi value arg
 
-
     cmake_parse_arguments("arg" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
 
     message("ARGN was ${ARGN}")
 
     if(arg_ADDITIONAL_LIBS)
+        set(ARG_PREFIX "none") #"none" results in a link without prefix (see debug, optimized, or general keywords in https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
         message("arg_ADDITIONAL_LIBS was ${arg_ADDITIONAL_LIBS}")
         foreach(f ${arg_ADDITIONAL_LIBS})
-            message("SHALL LINK WITH ${f}")
+            if((${f} STREQUAL "debug") OR (${f} STREQUAL "optimized") OR (${f} STREQUAL "general"))
+                SET(ARG_PREFIX ${f})
+            else()
+                target_link_libraries_with_arg_prefix(${ARG_PREFIX} ${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} ${f})
+                set(ARG_PREFIX "none")
+            endif()
         endforeach()
     else()
-        message("arg_ADDITIONAL_LIBS was not set")
+        #arg_ADDITIONAL_LIBS is not set therefore no need to do anything about other libraries
     endif()
 
 
-
+#[[ #[[ introduces a BLOCK comment. Nice Cmake!
     set(PARSING_ADDITIONAL_LIBS OFF)
     set(PARSING_VALGRIND_SUPPRESSIONS_FILE OFF)
     #probably not needed set(VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER)
@@ -81,6 +86,7 @@ function(build_lib whatIsBuilding solution_folder)
         endif()
 
     endforeach()
+]]
 
     if (TARGET c_logging_v2)
         target_link_libraries(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} c_logging_v2)

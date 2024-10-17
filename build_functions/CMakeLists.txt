@@ -213,6 +213,10 @@ function(build_test_folder test_folder)
 
         cmake_parse_arguments(arg "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+        if(arg_BINARY_DIR)
+            MESSAGE("DETECTED arg_BINARY_DIR=${arg_BINARY_DIR}")
+        endif()
+
         set(building exe)
         add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})
 

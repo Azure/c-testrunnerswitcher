@@ -37,6 +37,8 @@ function(build_lib whatIsBuilding solution_folder)
 
     cmake_parse_arguments("arg" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
 
+    message("ARGN was ${ARGN}")
+
     if(arg_ADDITIONAL_LIBS)
         message("arg_ADDITIONAL_LIBS was ${arg_ADDITIONAL_LIBS}")
         foreach(f ${arg_ADDITIONAL_LIBS})

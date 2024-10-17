@@ -3,6 +3,11 @@
 
 set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
+#build_lib produces a lib that can be used with an exe and/or dll for testing
+#ARGN have the format
+#ADDITIONAL_LIBS list of libraries. The libraries is a list consisting of repeating the following
+#   a library name
+#   "debug" or "optimized" or "general" followed by a library name
 function(build_lib whatIsBuilding solution_folder)
 
     add_library(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME}
@@ -25,9 +30,21 @@ function(build_lib whatIsBuilding solution_folder)
     endif()
     target_compile_definitions(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
 
+    set(options) #there are no options
+    set(oneValueArgs) #there are single value arg (maybe)
+    set(multiValueArgs ADDITIONAL_LIBS) #no multi value args
+
+
+    cmake_parse_arguments("arg" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
+
+    foreach(f ${arg_ADDITIONAL_LIBS})
+        message("SHALL LINK WITH ${f}")
+    endforeach()
+
     set(PARSING_ADDITIONAL_LIBS OFF)
     set(PARSING_VALGRIND_SUPPRESSIONS_FILE OFF)
-    set(VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER)
+    #probably not needed set(VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER)
+    #probably also not used: VALGRIND_SUPPRESSIONS_FILE
     set(ARG_PREFIX "none")
     foreach(f ${ARGN})
         set(skip_to_next FALSE)

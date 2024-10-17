@@ -214,14 +214,6 @@ function(build_test_folder test_folder)
 
         cmake_parse_arguments("arg" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"" means don't use any decoration for the variable names
 
-        foreach(f ${ARGN})
-            message("ARGN=${f}")
-        endforeach()
-
-        if(arg_BINARY_DIR)
-            MESSAGE("DETECTED arg_BINARY_DIR=${arg_BINARY_DIR}")
-        endif()
-
         set(building exe)
         add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})
 

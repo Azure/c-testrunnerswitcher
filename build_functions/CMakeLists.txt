@@ -31,11 +31,11 @@ function(build_lib whatIsBuilding solution_folder)
     target_compile_definitions(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
 
     set(options) #there are no options
-    set(oneValueArgs) #there are single value arg (maybe)
-    set(multiValueArgs ADDITIONAL_LIBS) #no multi value args
+    set(oneValueArgs) #no single value arg
+    set(multiValueArgs ADDITIONAL_LIBS) # only ADDITIONAL_LIBS is a multi value arg
 
 
-    cmake_parse_arguments("arg" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
+    cmake_parse_arguments("arg" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
 
     message("ARGN was ${ARGN}")
 

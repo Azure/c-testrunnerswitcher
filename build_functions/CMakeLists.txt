@@ -5,7 +5,7 @@ set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
 #build_lib produces a lib that can be used with an exe and/or dll for testing
 #ARGN have the format
-#ADDITIONAL_LIBS list of libraries. The libraries is a list consisting of repeating the following
+#ADDITIONAL_LIBS list of libraries. The libraries is a list consisting of repeating the following:
 #   a library name
 #   "debug" or "optimized" or "general" followed by a library name
 #MOCK_PRECOMPILE_HEADERS is a list of headers that should be precompiled between #define ENABLE_MOCKS and #undef ENABLE_MOCKS
@@ -62,7 +62,7 @@ function(build_lib whatIsBuilding solution_folder)
 
         set(MOCKS_HEADER_CONTENT "// Copyright (c) Microsoft. All rights reserved.\n")
         set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}// Licensed under the MIT license. See LICENSE file in the project root for full license information.\n")
-        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}// THIS IS A GENERATED FILE, DO NOT EDIT. It was generated using function build_lib from CMakeLists.txt in testrunnerswitcher.\n")
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}// THIS IS A GENERATED FILE, DO NOT EDIT. It was generated using function build_lib from https://github.com/Azure/c-testrunnerswitcher/blob/master/build_functions/CMakeLists.txt.\n")
         set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}// To change this file content, edit build_test_artifacts's arguments from CMakeLists.txt\n\n")
 
         set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#ifndef ${LIBRARY_NAME_UPPER}_MOCKS_H\n")
@@ -87,7 +87,7 @@ function(build_lib whatIsBuilding solution_folder)
 
         set(MOCKS_SOURCE_CONTENT "// Copyright (c) Microsoft. All rights reserved.\n")
         set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}// Licensed under the MIT license. See LICENSE file in the project root for full license information.\n")
-        set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}// THIS IS A GENERATED FILE, DO NOT EDIT. It was generated using function build_lib from CMakeLists.txt in testrunnerswitcher.\n")
+        set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}// THIS IS A GENERATED FILE, DO NOT EDIT. It was generated using function build_lib in https://github.com/Azure/c-testrunnerswitcher/blob/master/build_functions/CMakeLists.txt.\n")
         set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}// To change this file content, edit build_test_artifacts's arguments from CMakeLists.txt\n\n")
 
         foreach(HEADER_FILE ${arg_NO_MOCK_PRECOMPILE_HEADERS})
@@ -107,7 +107,6 @@ function(build_lib whatIsBuilding solution_folder)
 
         target_precompile_headers(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${MOCKS_HEADER_FILE})
         target_sources(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${MOCKS_SOURCE_FILE})
-    else()
     endif()
 
     if (TARGET c_logging_v2)

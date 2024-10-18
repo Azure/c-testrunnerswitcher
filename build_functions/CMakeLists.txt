@@ -8,8 +8,8 @@ set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 #ADDITIONAL_LIBS list of libraries. The libraries is a list consisting of repeating the following
 #   a library name
 #   "debug" or "optimized" or "general" followed by a library name
-#PRECOMPILE_HEADERS is a list of headers that should be precompiled
-#NO_PRECOMPILE_HEADERS is a list of headers that should not be precompiled (TODO: better name? explanatin)
+#MOCK_PRECOMPILE_HEADERS is a list of headers that should be precompiled between #define ENABLE_MOCKS and #undef ENABLE_MOCKS
+#NO_MOCK_PRECOMPILE_HEADERS is a list of headers that should be precompiled but before and outside of #define ENABLE_MOCKS and #undef ENABLE_MOCKS
 
 function(build_lib whatIsBuilding solution_folder)
 
@@ -35,7 +35,7 @@ function(build_lib whatIsBuilding solution_folder)
 
     set(options) #there are no options
     set(oneValueArgs) #no single value arg
-    set(multiValueArgs ADDITIONAL_LIBS PRECOMPILE_HEADERS NO_PRECOMPILE_HEADERS) # only ADDITIONAL_LIBS is a multi value arg
+    set(multiValueArgs ADDITIONAL_LIBS MOCK_PRECOMPILE_HEADERS NO_MOCK_PRECOMPILE_HEADERS) # only ADDITIONAL_LIBS is a multi value arg
 
     cmake_parse_arguments("arg" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
 
@@ -53,44 +53,62 @@ function(build_lib whatIsBuilding solution_folder)
         #arg_ADDITIONAL_LIBS is not set therefore no need to do anything about libraries
     endif()
 
-    if(arg_PRECOMPILE_HEADERS)
-        target_precompile_headers(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${arg_PRECOMPILE_HEADERS})
+    if(arg_MOCK_PRECOMPILE_HEADERS OR arg_NO_MOCK_PRECOMPILE_HEADERS)
+
+        string(TOUPPER ${whatIsBuilding} LIBRARY_NAME_UPPER)
+
+        set(MOCKS_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/${whatIsBuilding}_mocks.h)
+        set(MOCKS_SOURCE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${whatIsBuilding}_mocks.c)
+
+        set(MOCKS_HEADER_CONTENT "// Copyright (c) Microsoft. All rights reserved.\n")
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}// Licensed under the MIT license. See LICENSE file in the project root for full license information.\n")
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}// THIS IS A GENERATED FILE, DO NOT EDIT. It was generated using function build_lib from CMakeLists.txt in testrunnerswitcher.\n")
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}// To change this file content, edit build_test_artifacts's arguments from CMakeLists.txt\n\n")
+
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#ifndef ${LIBRARY_NAME_UPPER}_MOCKS_H\n")
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#define ${LIBRARY_NAME_UPPER}_MOCKS_H\n\n")
+
+        foreach(HEADER_FILE ${arg_NO_MOCK_PRECOMPILE_HEADERS})
+            set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#include \"${HEADER_FILE}\"\n")
+        endforeach()
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}\n")
+
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#define ENABLE_MOCKS\n")
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#define ENABLE_MOCKS_DECL\n")
+        foreach(HEADER_FILE ${arg_MOCK_PRECOMPILE_HEADERS})
+            set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#include \"${HEADER_FILE}\"\n")
+        endforeach()
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#undef ENABLE_MOCKS_DECL\n")
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#undef ENABLE_MOCKS\n\n")
+
+        set(MOCKS_HEADER_CONTENT "${MOCKS_HEADER_CONTENT}#endif // ${LIBRARY_NAME_UPPER}_MOCKS_H\n")
+
+        file(WRITE ${MOCKS_HEADER_FILE} ${MOCKS_HEADER_CONTENT})
+
+        set(MOCKS_SOURCE_CONTENT "// Copyright (c) Microsoft. All rights reserved.\n")
+        set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}// Licensed under the MIT license. See LICENSE file in the project root for full license information.\n")
+        set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}// THIS IS A GENERATED FILE, DO NOT EDIT. It was generated using function build_lib from CMakeLists.txt in testrunnerswitcher.\n")
+        set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}// To change this file content, edit build_test_artifacts's arguments from CMakeLists.txt\n\n")
+
+        foreach(HEADER_FILE ${arg_NO_MOCK_PRECOMPILE_HEADERS})
+            set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}#include \"${HEADER_FILE}\"\n")
+        endforeach()
+        set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}\n")
+
+        set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}#define ENABLE_MOCKS\n")
+        foreach(HEADER_FILE ${arg_MOCK_PRECOMPILE_HEADERS})
+            set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}#include \"${HEADER_FILE}\"\n")
+        endforeach()
+        set(MOCKS_SOURCE_CONTENT "${MOCKS_SOURCE_CONTENT}#undef ENABLE_MOCKS\n")
+
+        file(WRITE ${MOCKS_SOURCE_FILE} ${MOCKS_SOURCE_CONTENT})
+
+        set_source_files_properties(${MOCKS_SOURCE_FILE} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+
+        target_precompile_headers(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${MOCKS_HEADER_FILE})
+        target_sources(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${MOCKS_SOURCE_FILE})
+    else()
     endif()
-
-
-#[[ #[[ introduces a BLOCK comment. Nice Cmake!
-    set(PARSING_ADDITIONAL_LIBS OFF)
-    set(PARSING_VALGRIND_SUPPRESSIONS_FILE OFF)
-    #probably not needed set(VALGRIND_SUPPRESSIONS_FILE_EXTRA_PARAMETER)
-    #probably also not used: VALGRIND_SUPPRESSIONS_FILE
-    set(ARG_PREFIX "none")
-    foreach(f ${ARGN})
-        set(skip_to_next FALSE)
-        if(${f} STREQUAL "ADDITIONAL_LIBS")
-            SET(PARSING_ADDITIONAL_LIBS ON)
-            SET(PARSING_VALGRIND_SUPPRESSIONS_FILE OFF)
-            set(ARG_PREFIX "none")
-            #also unset all the other states
-            set(skip_to_next TRUE)
-        elseif(${f} STREQUAL "VALGRIND_SUPPRESSIONS_FILE")
-            SET(PARSING_ADDITIONAL_LIBS OFF)
-            SET(PARSING_VALGRIND_SUPPRESSIONS_FILE ON)
-            set(skip_to_next TRUE)
-        endif()
-
-        if(NOT skip_to_next)
-            if(PARSING_ADDITIONAL_LIBS)
-                if((${f} STREQUAL "debug") OR (${f} STREQUAL "optimized") OR (${f} STREQUAL "general"))
-                    SET(ARG_PREFIX ${f})
-                else()
-                    target_link_libraries_with_arg_prefix(${ARG_PREFIX} ${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} ${f})
-                    set(ARG_PREFIX "none")
-                endif()
-            endif()
-        endif()
-
-    endforeach()
-]]
 
     if (TARGET c_logging_v2)
         target_link_libraries(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} c_logging_v2)

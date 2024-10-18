@@ -8,6 +8,9 @@ set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 #ADDITIONAL_LIBS list of libraries. The libraries is a list consisting of repeating the following
 #   a library name
 #   "debug" or "optimized" or "general" followed by a library name
+#PRECOMPILE_HEADERS is a list of headers that should be precompiled
+#NO_PRECOMPILE_HEADERS is a list of headers that should not be precompiled (TODO: better name? explanatin)
+
 function(build_lib whatIsBuilding solution_folder)
 
     add_library(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME}
@@ -32,12 +35,12 @@ function(build_lib whatIsBuilding solution_folder)
 
     set(options) #there are no options
     set(oneValueArgs) #no single value arg
-    set(multiValueArgs ADDITIONAL_LIBS) # only ADDITIONAL_LIBS is a multi value arg
+    set(multiValueArgs ADDITIONAL_LIBS PRECOMPILE_HEADERS NO_PRECOMPILE_HEADERS) # only ADDITIONAL_LIBS is a multi value arg
 
     cmake_parse_arguments("arg" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
 
     if(arg_ADDITIONAL_LIBS)
-        set(ARG_PREFIX "none") #"none" results in a link without prefix (see debug, optimized, or general keywords in https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
+        set(ARG_PREFIX "none") # "none" results in a link without prefix in function target_link_libraries_with_arg_prefix. Also see debug, optimized, or general keywords in https://cmake.org/cmake/help/latest/command/target_link_libraries.html
         foreach(f ${arg_ADDITIONAL_LIBS})
             if((${f} STREQUAL "debug") OR (${f} STREQUAL "optimized") OR (${f} STREQUAL "general"))
                 SET(ARG_PREFIX ${f})
@@ -48,6 +51,10 @@ function(build_lib whatIsBuilding solution_folder)
         endforeach()
     else()
         #arg_ADDITIONAL_LIBS is not set therefore no need to do anything about libraries
+    endif()
+
+    if(arg_PRECOMPILE_HEADERS)
+        target_precompile_headers(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${arg_PRECOMPILE_HEADERS})
     endif()
 
 

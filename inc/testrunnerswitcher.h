@@ -21,7 +21,7 @@
 typedef void* TEST_MUTEX_HANDLE;
 
 // a macro useful for disabling tests while debugging
-#define TEST_DISABLED_FUNCTION(name)    void name(void)
+#define DISABLED_TEST_FUNCTION(name)    void name(void)
 
 #ifdef USE_CTEST
 

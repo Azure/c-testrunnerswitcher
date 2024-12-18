@@ -20,6 +20,9 @@
 
 typedef void* TEST_MUTEX_HANDLE;
 
+// a macro useful for disabling tests while debugging
+#define DISABLED_TEST_FUNCTION(name)    void name(void)
+
 #ifdef USE_CTEST
 
 #define TEST_DEFINE_ENUM_TYPE(type, ...) CTEST_DEFINE_ENUM_TYPE(type, __VA_ARGS__)

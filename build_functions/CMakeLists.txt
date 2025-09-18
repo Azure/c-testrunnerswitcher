@@ -33,7 +33,7 @@ function(build_lib whatIsBuilding solution_folder)
     endif()
     target_compile_definitions(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
 
-    set(options) #there are no options
+    set(options ENABLE_TEST_FILES_PRECOMPILED_HEADERS) #there are no options
     set(oneValueArgs) #no single value arg
     set(multiValueArgs ADDITIONAL_LIBS MOCK_PRECOMPILE_HEADERS NO_MOCK_PRECOMPILE_HEADERS) # only ADDITIONAL_LIBS is a multi value arg
 
@@ -107,6 +107,50 @@ function(build_lib whatIsBuilding solution_folder)
 
         target_precompile_headers(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${MOCKS_HEADER_FILE})
         target_sources(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${MOCKS_SOURCE_FILE})
+    endif()
+
+    if(arg_ENABLE_TEST_FILES_PRECOMPILED_HEADERS)
+        # Check that exactly one test file exists
+        list(LENGTH ${whatIsBuilding}_test_files TEST_FILES_COUNT)
+        if(NOT TEST_FILES_COUNT EQUAL 1)
+            message(WARNING "ENABLE_TEST_FILES_PRECOMPILED_HEADERS requires exactly one test file, but found ${TEST_FILES_COUNT} files in ${whatIsBuilding}_test_files: ${${whatIsBuilding}_test_files}")
+        else()
+            # Get the single test file
+            list(GET ${whatIsBuilding}_test_files 0 TEST_FILE)
+            
+            # Compute the header filename by replacing extension with .h
+            get_filename_component(TEST_FILE_NAME_WE ${TEST_FILE} NAME_WE)
+            set(PRECOMPILED_HEADER_FILENAME "${CMAKE_CURRENT_LIST_DIR}/${TEST_FILE_NAME_WE}.h")
+            
+            # Generate the {what_is_building}_mocks.c file
+            set(TEST_MOCKS_SOURCE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${whatIsBuilding}_mocks.c)
+            
+            set(TEST_MOCKS_SOURCE_CONTENT "// Copyright (c) Microsoft. All rights reserved.\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}// Licensed under the MIT license. See LICENSE file in the project root for full license information.\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}// THIS IS A GENERATED FILE, DO NOT EDIT. It was generated using function build_lib in https://github.com/Azure/c-testrunnerswitcher/blob/master/build_functions/CMakeLists.txt.\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}// To change this file content, edit build_test_artifacts's arguments from CMakeLists.txt\n\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}#undef ENABLE_MOCKS_DECL\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}#include \"${PRECOMPILED_HEADER_FILENAME}\"\n")
+            
+            file(WRITE ${TEST_MOCKS_SOURCE_FILE} ${TEST_MOCKS_SOURCE_CONTENT})
+            
+            # Setup precompiled headers using the computed header filename
+            target_precompile_headers(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${PRECOMPILED_HEADER_FILENAME})
+            
+            # Add the generated _mocks.c file to the target sources
+            target_sources(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${TEST_MOCKS_SOURCE_FILE})
+            
+            # Set SKIP_PRECOMPILE_HEADERS for the generated mocks file
+            set_source_files_properties(${TEST_MOCKS_SOURCE_FILE} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+
+            target_compile_definitions(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PUBLIC ENABLE_MOCKS_DECL)
+
+            set_source_files_properties(${TEST_MOCKS_SOURCE_FILE} PROPERTIES COMPILE_DEFINITIONS "")
+
+            # Set SKIP_PRECOMPILE_HEADERS for source files to avoid conflicts
+            set_source_files_properties(${${whatIsBuilding}_c_files} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+            set_source_files_properties(${${whatIsBuilding}_cpp_files} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+        endif()
     endif()
 
     if (TARGET c_logging_v2)

@@ -151,6 +151,9 @@ function(build_lib whatIsBuilding solution_folder)
             
             file(WRITE ${TEST_MOCKS_SOURCE_FILE} ${TEST_MOCKS_SOURCE_CONTENT})
             
+            # Add the precompiled header file to the target sources  
+            target_sources(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${PRECOMPILED_HEADER_FILENAME})
+            
             # Setup precompiled headers using the computed header filename
             target_precompile_headers(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${PRECOMPILED_HEADER_FILENAME})
             

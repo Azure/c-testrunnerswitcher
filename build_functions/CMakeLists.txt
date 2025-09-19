@@ -10,6 +10,9 @@ set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 #   "debug" or "optimized" or "general" followed by a library name
 #MOCK_PRECOMPILE_HEADERS is a list of headers that should be precompiled between #define ENABLE_MOCKS and #undef ENABLE_MOCKS
 #NO_MOCK_PRECOMPILE_HEADERS is a list of headers that should be precompiled but before and outside of #define ENABLE_MOCKS and #undef ENABLE_MOCKS
+#ENABLE_TEST_FILES_PRECOMPILED_HEADERS enables precompiled headers for test files. Can be:
+#   - ON/TRUE (or just the flag): computes header filename from the first test file (requires exactly one test file)
+#   - specific header filename: uses the provided header file for precompiled headers
 
 function(build_lib whatIsBuilding solution_folder)
 
@@ -34,7 +37,7 @@ function(build_lib whatIsBuilding solution_folder)
     target_compile_definitions(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PUBLIC -DTEST_SUITE_NAME_FROM_CMAKE=${whatIsBuilding})
 
     set(options) #there are no options
-    set(oneValueArgs) #no single value arg
+    set(oneValueArgs ENABLE_TEST_FILES_PRECOMPILED_HEADERS) #ENABLE_TEST_FILES_PRECOMPILED_HEADERS can optionally specify a header file
     set(multiValueArgs ADDITIONAL_LIBS MOCK_PRECOMPILE_HEADERS NO_MOCK_PRECOMPILE_HEADERS) # only ADDITIONAL_LIBS is a multi value arg
 
     cmake_parse_arguments("arg" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
@@ -107,6 +110,67 @@ function(build_lib whatIsBuilding solution_folder)
 
         target_precompile_headers(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${MOCKS_HEADER_FILE})
         target_sources(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${MOCKS_SOURCE_FILE})
+    endif()
+
+    # ENABLE_TEST_FILES_PRECOMPILED_HEADERS creates precompiled headers for the test file
+    # It expects that exactly one test file exists. This is because cmake's target_precompile_headers
+    # only allows one precompiled headers file.
+    # If a specific header filename is provided, that is used.
+    # If just the flag is provided, the header filename is by convention computed from the test file by suffixing the test file with _pch and having extension .h
+    # A _mocks.c file is generated that includes the precompiled header without ENABLE_MOCKS_DECL,
+    # having the purpose of providing the mock implementations.
+    if(arg_ENABLE_TEST_FILES_PRECOMPILED_HEADERS)
+        # Check that exactly one test file exists (required for all cases)
+        list(LENGTH ${whatIsBuilding}_test_files TEST_FILES_COUNT)
+        if(NOT TEST_FILES_COUNT EQUAL 1)
+            message(FATAL_ERROR "ENABLE_TEST_FILES_PRECOMPILED_HEADERS requires exactly one test file, but found ${TEST_FILES_COUNT} files in ${whatIsBuilding}_test_files: ${${whatIsBuilding}_test_files}")
+        else()
+            # Check if a specific header file was provided
+            if(NOT (arg_ENABLE_TEST_FILES_PRECOMPILED_HEADERS STREQUAL "ON" OR arg_ENABLE_TEST_FILES_PRECOMPILED_HEADERS STREQUAL "TRUE"))
+                # A specific header filename was provided
+                set(PRECOMPILED_HEADER_FILENAME "${arg_ENABLE_TEST_FILES_PRECOMPILED_HEADERS}")
+            else()
+                # No specific header provided, compute it from the first test file
+                # Get the single test file
+                list(GET ${whatIsBuilding}_test_files 0 TEST_FILE)
+                
+                # Compute the header filename by replacing extension with _ut_pch.h
+                get_filename_component(TEST_FILE_NAME_WITHOUT_EXTENSION ${TEST_FILE} NAME_WE)
+                set(PRECOMPILED_HEADER_FILENAME "${CMAKE_CURRENT_LIST_DIR}/${TEST_FILE_NAME_WITHOUT_EXTENSION}_pch.h")
+            endif()
+            
+            # Generate the {what_is_building}_mocks.c file
+            set(TEST_MOCKS_SOURCE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${whatIsBuilding}_mocks.c)
+            
+            set(TEST_MOCKS_SOURCE_CONTENT "// Copyright (c) Microsoft. All rights reserved.\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}// Licensed under the MIT license. See LICENSE file in the project root for full license information.\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}// THIS IS A GENERATED FILE, DO NOT EDIT. It was generated using function build_lib in https://github.com/Azure/c-testrunnerswitcher/blob/master/build_functions/CMakeLists.txt.\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}// To change this file content, edit build_test_artifacts's arguments from CMakeLists.txt\n\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}#undef ENABLE_MOCKS_DECL\n")
+            set(TEST_MOCKS_SOURCE_CONTENT "${TEST_MOCKS_SOURCE_CONTENT}#include \"${PRECOMPILED_HEADER_FILENAME}\"\n")
+            
+            file(WRITE ${TEST_MOCKS_SOURCE_FILE} ${TEST_MOCKS_SOURCE_CONTENT})
+            
+            # Add the precompiled header file to the target sources  
+            target_sources(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${PRECOMPILED_HEADER_FILENAME})
+            
+            # Setup precompiled headers using the computed header filename
+            target_precompile_headers(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${PRECOMPILED_HEADER_FILENAME})
+            
+            # Add the generated _mocks.c file to the target sources
+            target_sources(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PRIVATE ${TEST_MOCKS_SOURCE_FILE})
+            
+            # Set SKIP_PRECOMPILE_HEADERS for the generated mocks file
+            set_source_files_properties(${TEST_MOCKS_SOURCE_FILE} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+
+            # define ENABLE_MOCKS_DECL to enable mock declarations in the precompiled header
+            # so that everything except the mocks file gets the mock declarations and the mocks file gets the implementation
+            target_compile_definitions(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PUBLIC ENABLE_MOCKS_DECL)
+
+            # Set SKIP_PRECOMPILE_HEADERS for source files to avoid conflicts
+            set_source_files_properties(${${whatIsBuilding}_c_files} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+            set_source_files_properties(${${whatIsBuilding}_cpp_files} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+        endif()
     endif()
 
     if (TARGET c_logging_v2)

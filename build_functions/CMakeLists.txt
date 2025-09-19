@@ -116,14 +116,14 @@ function(build_lib whatIsBuilding solution_folder)
     # It expects that exactly one test file exists. This is because cmake's target_precompile_headers
     # only allows one precompiled headers file.
     # If a specific header filename is provided, that is used.
-    # If just the flag is provided, the header filename is by convention computed from the test file by replacing the extension with .h
+    # If just the flag is provided, the header filename is by convention computed from the test file by suffixing the test file with _pch and having extension .h
     # A _mocks.c file is generated that includes the precompiled header without ENABLE_MOCKS_DECL,
     # having the purpose of providing the mock implementations.
     if(arg_ENABLE_TEST_FILES_PRECOMPILED_HEADERS)
         # Check that exactly one test file exists (required for all cases)
         list(LENGTH ${whatIsBuilding}_test_files TEST_FILES_COUNT)
         if(NOT TEST_FILES_COUNT EQUAL 1)
-            message(WARNING "ENABLE_TEST_FILES_PRECOMPILED_HEADERS requires exactly one test file, but found ${TEST_FILES_COUNT} files in ${whatIsBuilding}_test_files: ${${whatIsBuilding}_test_files}")
+            message(FATAL_ERROR "ENABLE_TEST_FILES_PRECOMPILED_HEADERS requires exactly one test file, but found ${TEST_FILES_COUNT} files in ${whatIsBuilding}_test_files: ${${whatIsBuilding}_test_files}")
         else()
             # Check if a specific header file was provided
             if(NOT (arg_ENABLE_TEST_FILES_PRECOMPILED_HEADERS STREQUAL "ON" OR arg_ENABLE_TEST_FILES_PRECOMPILED_HEADERS STREQUAL "TRUE"))
@@ -134,9 +134,9 @@ function(build_lib whatIsBuilding solution_folder)
                 # Get the single test file
                 list(GET ${whatIsBuilding}_test_files 0 TEST_FILE)
                 
-                # Compute the header filename by replacing extension with .h
-                get_filename_component(TEST_FILE_NAME_WE ${TEST_FILE} NAME_WE)
-                set(PRECOMPILED_HEADER_FILENAME "${CMAKE_CURRENT_LIST_DIR}/${TEST_FILE_NAME_WE}.h")
+                # Compute the header filename by replacing extension with _ut_pch.h
+                get_filename_component(TEST_FILE_NAME_WITHOUT_EXTENSION ${TEST_FILE} NAME_WE)
+                set(PRECOMPILED_HEADER_FILENAME "${CMAKE_CURRENT_LIST_DIR}/${TEST_FILE_NAME_WITHOUT_EXTENSION}_pch.h")
             endif()
             
             # Generate the {what_is_building}_mocks.c file

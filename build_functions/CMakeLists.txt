@@ -42,6 +42,16 @@ function(build_lib whatIsBuilding solution_folder)
 
     cmake_parse_arguments("arg" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
 
+    # Validation: Ensure MOCK_PRECOMPILE_HEADERS and ENABLE_TEST_FILES_PRECOMPILED_HEADERS are not used together
+    if((arg_MOCK_PRECOMPILE_HEADERS OR arg_NO_MOCK_PRECOMPILE_HEADERS) AND arg_ENABLE_TEST_FILES_PRECOMPILED_HEADERS)
+        message(FATAL_ERROR 
+            "Cannot use both MOCK_PRECOMPILE_HEADERS/NO_MOCK_PRECOMPILE_HEADERS and ENABLE_TEST_FILES_PRECOMPILED_HEADERS together in ${whatIsBuilding}. "
+            "These are mutually exclusive precompiled header approaches:\n"
+            "  - MOCK_PRECOMPILE_HEADERS: Legacy approach that generates _mocks.h files\n"
+            "  - ENABLE_TEST_FILES_PRECOMPILED_HEADERS: New approach that uses test-specific _pch.h files\n"
+            "Please use only one approach. The recommended approach is ENABLE_TEST_FILES_PRECOMPILED_HEADERS.")
+    endif()
+
     if(arg_ADDITIONAL_LIBS)
         set(ARG_PREFIX "none") # "none" results in a link without prefix in function target_link_libraries_with_arg_prefix. Also see debug, optimized, or general keywords in https://cmake.org/cmake/help/latest/command/target_link_libraries.html
         foreach(f ${arg_ADDITIONAL_LIBS})

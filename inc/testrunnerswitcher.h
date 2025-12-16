@@ -23,6 +23,81 @@ typedef void* TEST_MUTEX_HANDLE;
 // a macro useful for disabling tests while debugging
 #define DISABLED_TEST_FUNCTION(name)    void name(void)
 
+/*
+ * PARAMETERIZED_TEST_FUNCTION - A macro for defining parameterized test functions
+ *
+ * Usage:
+ *   PARAMETERIZED_TEST_FUNCTION(base_name,
+ *       ARGS(type1, param1, type2, param2),
+ *       CASE((value1, value2), suffix1),
+ *       CASE((value3, value4), suffix2))
+ *   {
+ *       // test code using param1, param2
+ *   }
+ *
+ * This expands to:
+ *   - A static function declaration
+ *   - Multiple TEST_FUNCTION wrappers that call the static function with the specified arguments
+ *   - The static function definition with the test body
+ *
+ * Example:
+ *   PARAMETERIZED_TEST_FUNCTION(test_addition,
+ *       ARGS(int, a, int, b, int, expected),
+ *       CASE((1, 2, 3), when_adding_1_and_2),
+ *       CASE((0, 0, 0), when_adding_zeros))
+ *   {
+ *       ASSERT_ARE_EQUAL(int, expected, a + b);
+ *   }
+ */
+
+/* Helper macros for extracting parts from ARGS(...) */
+/* ARGS format: (type1, name1, type2, name2, ...) - uses MU_FOR_EACH_2 */
+
+/* Add comma before parameter declaration (used for all but first) */
+#define PTRS_ARGS_DECL_REST_DO(type, name) , type name
+#define PTRS_ARGS_DECL_REST(...) MU_FOR_EACH_2(PTRS_ARGS_DECL_REST_DO, __VA_ARGS__)
+
+/* Main ARGS declaration - handles 2+ args (1+ pairs) */
+#define PTRS_ARGS_DECL_2(t1, n1) t1 n1
+#define PTRS_ARGS_DECL_MORE(t1, n1, ...) t1 n1 PTRS_ARGS_DECL_REST(__VA_ARGS__)
+#define PTRS_ARGS_DECL_DISPATCH_0(...) PTRS_ARGS_DECL_MORE(__VA_ARGS__)
+#define PTRS_ARGS_DECL_DISPATCH_1(...) PTRS_ARGS_DECL_2(__VA_ARGS__)
+#define PTRS_ARGS_DECL(...) MU_C2(PTRS_ARGS_DECL_DISPATCH_, MU_ISEMPTY(MU_IF(MU_ISZERO(MU_DEC(MU_DEC(MU_COUNT_ARG(__VA_ARGS__)))), 1, )))(__VA_ARGS__)
+
+/* The ARGS wrapper just passes through */
+#define ARGS(...) __VA_ARGS__
+
+/* Strip parentheses helper */
+#define PTRS_STRIP_PARENS(...) __VA_ARGS__
+
+/* Generate a single TEST_FUNCTION wrapper for a CASE */
+/* This is called with (base_name, (values), suffix) - values wrapped in parens */
+#define PTRS_GENERATE_ONE_WRAPPER_IMPL(base_name, values, suffix) \
+    TEST_FUNCTION(MU_C3(base_name, _, suffix)) \
+    { \
+        MU_C2(base_name, _impl)(PTRS_STRIP_PARENS values); \
+    }
+
+/* Helper to call IMPL with expanded args - this forces argument re-parsing */
+#define PTRS_GENERATE_ONE_WRAPPER_CALL(base_name, ...) PTRS_GENERATE_ONE_WRAPPER_IMPL(base_name, __VA_ARGS__)
+
+/* When we paste PTRS_EXPAND_CASE_ with CASE(values, suffix), we get PTRS_EXPAND_CASE_CASE(values, suffix) */
+/* which expands to just: values, suffix (removing the CASE wrapper) */
+#define PTRS_EXPAND_CASE_CASE(values, suffix) values, suffix
+
+/* This is called by MU_FOR_EACH_1_KEEP_1 with (base_name, CASE((vals), suffix)) */
+/* We use MU_C2B to paste PTRS_EXPAND_CASE_ with the case_item (which starts with CASE) */
+/* This gives us PTRS_EXPAND_CASE_CASE((vals), suffix) which expands to (vals), suffix */
+/* PTRS_GENERATE_ONE_WRAPPER_CALL uses __VA_ARGS__ to allow the expansion to split into multiple args */
+#define PTRS_GENERATE_ONE_WRAPPER(base_name, case_item) PTRS_GENERATE_ONE_WRAPPER_CALL(base_name, MU_C2B(PTRS_EXPAND_CASE_, case_item))
+
+/* Main PARAMETERIZED_TEST_FUNCTION macro */
+/* Usage: PARAMETERIZED_TEST_FUNCTION(name, ARGS(...), CASE((vals), suffix), ...) { body } */
+#define PARAMETERIZED_TEST_FUNCTION(base_name, args, ...) \
+    static void MU_C2(base_name, _impl)(PTRS_ARGS_DECL(args)); \
+    MU_FOR_EACH_1_KEEP_1(PTRS_GENERATE_ONE_WRAPPER, base_name, __VA_ARGS__) \
+    static void MU_C2(base_name, _impl)(PTRS_ARGS_DECL(args))
+
 #ifdef USE_CTEST
 
 #define TEST_DEFINE_ENUM_TYPE(type, ...) CTEST_DEFINE_ENUM_TYPE(type, __VA_ARGS__)

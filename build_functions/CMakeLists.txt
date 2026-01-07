@@ -28,8 +28,13 @@ function(build_lib whatIsBuilding solution_folder)
 
     set_target_properties(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME}
            PROPERTIES
-           FOLDER ${solution_folder}
-           LINK_FLAGS "/PROFILE") #needed for code coverage
+           FOLDER ${solution_folder})
+
+    if(WIN32)
+        set_target_properties(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME}
+               PROPERTIES
+               LINK_FLAGS "/PROFILE") #needed for code coverage
+    endif()
 
     target_compile_definitions(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME} PUBLIC -DUSE_CTEST)
     if(${use_cppunittest})
@@ -233,8 +238,13 @@ function(build_dll whatIsBuilding solution_folder custom_main)
 
     set_target_properties(${whatIsBuilding}_dll_${CMAKE_PROJECT_NAME}
                PROPERTIES
-               FOLDER ${solution_folder}
+               FOLDER ${solution_folder})
+
+    if(WIN32)
+        set_target_properties(${whatIsBuilding}_dll_${CMAKE_PROJECT_NAME}
+               PROPERTIES
                LINK_FLAGS "/PROFILE") #needed for code coverage
+    endif()
 
     target_compile_definitions(${whatIsBuilding}_dll_${CMAKE_PROJECT_NAME} PUBLIC -DUSE_CTEST)
     set_output_folder_properties(${whatIsBuilding}_dll_${CMAKE_PROJECT_NAME})
@@ -279,8 +289,13 @@ function(build_exe whatIsBuilding solution_folder custom_main)
 
     set_target_properties(${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}
                PROPERTIES
-               FOLDER ${solution_folder}
+               FOLDER ${solution_folder})
+
+    if(WIN32)
+        set_target_properties(${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}
+               PROPERTIES
                LINK_FLAGS "/PROFILE") #needed for code coverage
+    endif()
 
     set_output_folder_properties(${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME})
 

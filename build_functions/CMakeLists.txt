@@ -30,7 +30,7 @@ function(build_lib whatIsBuilding solution_folder)
            PROPERTIES
            FOLDER ${solution_folder})
 
-    if(WIN32 AND MSVC_VERSION GREATER 1949)
+    if(WIN32 AND MSVC_VERSION GREATER 1949) # older versions of MSVC linker have problems with /PROFILE
         set_target_properties(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME}
                PROPERTIES
                LINK_FLAGS "/PROFILE") #needed for code coverage
@@ -240,7 +240,7 @@ function(build_dll whatIsBuilding solution_folder custom_main)
                PROPERTIES
                FOLDER ${solution_folder})
 
-    if(WIN32 AND MSVC_VERSION GREATER 1949)
+    if(WIN32 AND MSVC_VERSION GREATER 1949) # older versions of MSVC linker have problems with /PROFILE
         set_target_properties(${whatIsBuilding}_dll_${CMAKE_PROJECT_NAME}
                PROPERTIES
                LINK_FLAGS "/PROFILE") #needed for code coverage
@@ -291,7 +291,7 @@ function(build_exe whatIsBuilding solution_folder custom_main)
                PROPERTIES
                FOLDER ${solution_folder})
 
-    if(WIN32 AND MSVC_VERSION GREATER 1949)
+    if(WIN32 AND MSVC_VERSION GREATER 1949) # older versions of MSVC linker have problems with /PROFILE
         set_target_properties(${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}
                PROPERTIES
                LINK_FLAGS "/PROFILE") #needed for code coverage

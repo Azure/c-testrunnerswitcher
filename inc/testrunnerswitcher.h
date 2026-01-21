@@ -32,17 +32,17 @@ typedef void* TEST_MUTEX_HANDLE;
 #ifdef CPP_UNITTEST
 #include "ctest_2_cppunittest.h"
 
-#define TEST_SUITE_INITIALIZE(name)     CTEST_SUITE_INITIALIZE(name, cppunittest_mutex_fixtures_suite_init)
-#define TEST_SUITE_CLEANUP(name)        CTEST_SUITE_CLEANUP(name, cppunittest_mutex_fixtures_suite_cleanup)
-#define TEST_FUNCTION_INITIALIZE(name)  CTEST_FUNCTION_INITIALIZE(name, cppunittest_mutex_fixtures_function_init)
-#define TEST_FUNCTION_CLEANUP(name)     CTEST_FUNCTION_CLEANUP(name, cppunittest_mutex_fixtures_function_cleanup)
+#define TEST_SUITE_INITIALIZE(name, ...)     CTEST_SUITE_INITIALIZE(name, cppunittest_mutex_fixtures_suite_init, ##__VA_ARGS__)
+#define TEST_SUITE_CLEANUP(name, ...)        CTEST_SUITE_CLEANUP(name, ##__VA_ARGS__, cppunittest_mutex_fixtures_suite_cleanup)
+#define TEST_FUNCTION_INITIALIZE(name, ...)  CTEST_FUNCTION_INITIALIZE(name, cppunittest_mutex_fixtures_function_init, ##__VA_ARGS__)
+#define TEST_FUNCTION_CLEANUP(name, ...)     CTEST_FUNCTION_CLEANUP(name, ##__VA_ARGS__, cppunittest_mutex_fixtures_function_cleanup)
 
 #else
 
-#define TEST_SUITE_INITIALIZE(name)     CTEST_SUITE_INITIALIZE(name)
-#define TEST_SUITE_CLEANUP(name)        CTEST_SUITE_CLEANUP(name)
-#define TEST_FUNCTION_INITIALIZE(name)  CTEST_FUNCTION_INITIALIZE(name)
-#define TEST_FUNCTION_CLEANUP(name)     CTEST_FUNCTION_CLEANUP(name)
+#define TEST_SUITE_INITIALIZE(name, ...)     CTEST_SUITE_INITIALIZE(name, ##__VA_ARGS__)
+#define TEST_SUITE_CLEANUP(name, ...)        CTEST_SUITE_CLEANUP(name, ##__VA_ARGS__)
+#define TEST_FUNCTION_INITIALIZE(name, ...)  CTEST_FUNCTION_INITIALIZE(name, ##__VA_ARGS__)
+#define TEST_FUNCTION_CLEANUP(name, ...)     CTEST_FUNCTION_CLEANUP(name, ##__VA_ARGS__)
 
 #endif
 

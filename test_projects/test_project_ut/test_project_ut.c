@@ -19,7 +19,7 @@ extern "C" {
 
 BEGIN_TEST_SUITE(test_project_ut)
 
-TEST_FUNCTION(a) // no-srs
+TEST_FUNCTION(a) // no-srs // no-aaa
 {
 
 }

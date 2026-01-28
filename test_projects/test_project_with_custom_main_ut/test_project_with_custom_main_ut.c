@@ -19,7 +19,7 @@ extern "C" {
 
 BEGIN_TEST_SUITE(test_project_with_custom_main_ut)
 
-TEST_FUNCTION(never_executed) // no-srs
+TEST_FUNCTION(never_executed) // no-srs // no-aaa
 {
     ASSERT_FAIL("This should never get executed");
 }

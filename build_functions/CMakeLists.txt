@@ -3,6 +3,13 @@
 
 set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
+# Hook mechanism for build_test_folder.
+# Dependencies can register functions to be called after each test folder is built.
+# Hook functions receive one argument: test_folder (the folder name, e.g. "my_module_int").
+function(add_build_test_folder_hook hook_function_name)
+    set_property(GLOBAL APPEND PROPERTY BUILD_TEST_FOLDER_HOOKS ${hook_function_name})
+endfunction()
+
 #build_lib produces a lib that can be used with an exe and/or dll for testing
 #ARGN have the format
 #ADDITIONAL_LIBS list of libraries. The libraries is a list consisting of repeating the following:
@@ -368,6 +375,14 @@ function(build_test_folder test_folder)
             set(building dll)
             add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})
         endif()
+
+        # Run registered build_test_folder hooks
+        get_property(hooks GLOBAL PROPERTY BUILD_TEST_FOLDER_HOOKS)
+        foreach(hook IN LISTS hooks)
+            if(COMMAND ${hook})
+                cmake_language(CALL ${hook} ${test_folder})
+            endif()
+        endforeach()
     else()
         #message("test_folder is ${test_folder} NOT BUILDING")
     endif()

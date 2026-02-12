@@ -3,13 +3,6 @@
 
 set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
-# Hook mechanism for build_test_folder.
-# Dependencies can register functions to be called after each test folder is built.
-# Hook functions receive one argument: test_folder (the folder name, e.g. "my_module_int").
-function(add_build_test_folder_hook hook_function_name)
-    set_property(GLOBAL APPEND PROPERTY BUILD_TEST_FOLDER_HOOKS ${hook_function_name})
-endfunction()
-
 #build_lib produces a lib that can be used with an exe and/or dll for testing
 #ARGN have the format
 #ADDITIONAL_LIBS list of libraries. The libraries is a list consisting of repeating the following:
@@ -349,6 +342,13 @@ function(build_exe whatIsBuilding solution_folder custom_main)
             endif()
         endif()
     endif()
+endfunction()
+
+# Hook mechanism for build_test_folder.
+# Dependencies can register functions to be called after each test folder is built.
+# Hook functions receive one argument: test_folder (the folder name, e.g. "my_module_int").
+function(add_build_test_folder_hook hook_function_name)
+    set_property(GLOBAL APPEND PROPERTY BUILD_TEST_FOLDER_HOOKS ${hook_function_name})
 endfunction()
 
 #drop in replacement for add_subdirectory :)

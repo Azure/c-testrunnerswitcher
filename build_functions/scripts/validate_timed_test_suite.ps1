@@ -12,35 +12,21 @@
     vanilla versions with a process watchdog that crashes the process and produces a dump
     on timeout, allowing dumps to be collected if the test hangs.
 
-    When the -Fix switch is provided, the script will automatically replace the vanilla
-    macros with their timed equivalents and add the required include if not present.
-
 .PARAMETER TestFolder
     The path to the test folder to validate.
-
-.PARAMETER Fix
-    If specified, automatically replace TEST_SUITE_INITIALIZE/CLEANUP with timed versions.
 
 .EXAMPLE
     .\validate_timed_test_suite.ps1 -TestFolder "C:\repo\tests\my_module_int"
 
     Validates integration test files in the folder and reports files using non-timed macros.
 
-.EXAMPLE
-    .\validate_timed_test_suite.ps1 -TestFolder "C:\repo\tests\my_module_int" -Fix
-
-    Validates and automatically replaces non-timed macros with timed versions.
-
 .NOTES
-    Returns exit code 0 if all files are valid (or were fixed), 1 if validation fails.
+    Returns exit code 0 if all files are valid, 1 if validation fails.
 #>
 
 param(
     [Parameter(Mandatory=$true)]
-    [string]$TestFolder,
-
-    [Parameter(Mandatory=$false)]
-    [switch]$Fix
+    [string]$TestFolder
 )
 
 # Set error action preference
@@ -50,13 +36,7 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Timed Test Suite Validation" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Test Folder: $TestFolder" -ForegroundColor White
-Write-Host "Fix Mode: $($Fix.IsPresent)" -ForegroundColor White
 Write-Host ""
-
-# Initialize counters
-$totalFiles = 0
-$filesWithViolations = @()
-$fixedFiles = @()
 
 # Get all integration test files in the folder
 Write-Host "Searching for integration test files (*_int.c)..." -ForegroundColor White
@@ -69,6 +49,9 @@ Write-Host ""
 # Uses negative lookbehind to exclude lines that already have TIMED_ prefix
 $initPattern = '(?<!TIMED_)TEST_SUITE_INITIALIZE\s*\('
 $cleanupPattern = '(?<!TIMED_)TEST_SUITE_CLEANUP\s*\('
+
+$totalFiles = 0
+$filesWithViolations = @()
 
 foreach ($file in $allFiles) {
     $totalFiles++
@@ -107,58 +90,6 @@ foreach ($file in $allFiles) {
             MatchCount = $matchingLines.Count
             Matches = $matchingLines
         }
-
-        if ($Fix) {
-            try {
-                $fixedLines = @()
-                $hasTimedInclude = $false
-                $lastIncludeIndex = -1
-
-                # First pass: check if timed_test_suite.h is already included and find last #include
-                for ($i = 0; $i -lt $lines.Count; $i++) {
-                    if ($lines[$i] -match '^\s*#\s*include') {
-                        $lastIncludeIndex = $i
-                        if ($lines[$i] -match 'timed_test_suite\.h') {
-                            $hasTimedInclude = $true
-                        }
-                    }
-                }
-
-                # Second pass: fix the macros and add include if needed
-                for ($i = 0; $i -lt $lines.Count; $i++) {
-                    $currentLine = $lines[$i]
-
-                    # Replace TEST_SUITE_INITIALIZE(name -> TIMED_TEST_SUITE_INITIALIZE(name, TIMED_TEST_DEFAULT_TIMEOUT_MS
-                    if ($currentLine -match $initPattern) {
-                        $currentLine = $currentLine -replace '(?<!TIMED_)TEST_SUITE_INITIALIZE\s*\(\s*(\w+)', 'TIMED_TEST_SUITE_INITIALIZE($1, TIMED_TEST_DEFAULT_TIMEOUT_MS'
-                    }
-
-                    # Replace TEST_SUITE_CLEANUP( -> TIMED_TEST_SUITE_CLEANUP(
-                    if ($currentLine -match $cleanupPattern) {
-                        $currentLine = $currentLine -replace '(?<!TIMED_)TEST_SUITE_CLEANUP', 'TIMED_TEST_SUITE_CLEANUP'
-                    }
-
-                    $fixedLines += $currentLine
-
-                    # Add the timed_test_suite.h include after the last #include line
-                    if ($i -eq $lastIncludeIndex -and -not $hasTimedInclude) {
-                        $fixedLines += '#include "c_pal/timed_test_suite.h"'
-                        $hasTimedInclude = $true
-                    }
-                }
-
-                # Write back to file
-                $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-                $fixedContent = ($fixedLines -join "`r`n") + "`r`n"
-                [System.IO.File]::WriteAllText($file.FullName, $fixedContent, $utf8NoBom)
-
-                Write-Host "         [FIXED] Replaced non-timed macros with timed versions" -ForegroundColor Green
-                $fixedFiles += $file.FullName
-            }
-            catch {
-                Write-Host "         [ERROR] Failed to fix: $_" -ForegroundColor Red
-            }
-        }
     }
 }
 
@@ -168,11 +99,7 @@ Write-Host "Validation Summary" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Total integration test files checked: $totalFiles" -ForegroundColor White
 
-if ($Fix -and $fixedFiles.Count -gt 0) {
-    Write-Host "Files fixed successfully: $($fixedFiles.Count)" -ForegroundColor Green
-}
-
-if ($filesWithViolations.Count -gt 0 -and -not $Fix) {
+if ($filesWithViolations.Count -gt 0) {
     Write-Host "Files with non-timed macros: $($filesWithViolations.Count)" -ForegroundColor Red
     Write-Host ""
     Write-Host "The following files use TEST_SUITE_INITIALIZE/CLEANUP instead of timed versions:" -ForegroundColor Yellow
@@ -186,19 +113,9 @@ if ($filesWithViolations.Count -gt 0 -and -not $Fix) {
     Write-Host "TIMED_TEST_SUITE_CLEANUP from c_pal/timed_test_suite.h to allow" -ForegroundColor Cyan
     Write-Host "dumps to be collected if the test hangs." -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "To fix these files automatically, run with -Fix parameter." -ForegroundColor Cyan
-    Write-Host ""
-}
-
-$unfixedFiles = $filesWithViolations.Count - $fixedFiles.Count
-
-if ($unfixedFiles -eq 0) {
-    Write-Host "[VALIDATION PASSED]" -ForegroundColor Green
-    exit 0
-} else {
     Write-Host "[VALIDATION FAILED]" -ForegroundColor Red
-    if ($Fix) {
-        Write-Host "$unfixedFiles file(s) could not be fixed automatically." -ForegroundColor Yellow
-    }
     exit 1
 }
+
+Write-Host "[VALIDATION PASSED]" -ForegroundColor Green
+exit 0

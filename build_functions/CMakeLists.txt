@@ -354,7 +354,7 @@ function(validate_timed_test_suite test_folder)
         endif()
     endif()
 
-    set(script_path "${trsw_internal_dir}/validate_timed_test_suite.ps1")
+    set(script_path "${trsw_internal_dir}/scripts/validate_timed_test_suite.ps1")
     if(EXISTS "${script_path}")
         add_custom_target(${test_folder}_timed_suite_check ALL
             COMMAND powershell.exe -ExecutionPolicy Bypass
@@ -433,5 +433,5 @@ function(build_test_artifacts_with_custom_main whatIsBuilding solution_folder )
 endfunction()
 
 if(${run_unittests})
-    add_subdirectory(tests_validate_timed_test_suite)
+    add_subdirectory(tests/validate_timed_test_suite)
 endif()

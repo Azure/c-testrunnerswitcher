@@ -15,18 +15,25 @@
 .PARAMETER TestFolder
     The path to the test folder to validate.
 
+.PARAMETER NumExpectedViolations
+    The number of files expected to have violations. When the actual violation count matches
+    this value, the script exits with code 0. Default is 0 (no violations expected).
+
 .EXAMPLE
     .\validate_timed_test_suite.ps1 -TestFolder "C:\repo\tests\my_module_int"
 
     Validates integration test files in the folder and reports files using non-timed macros.
 
 .NOTES
-    Returns exit code 0 if all files are valid, 1 if validation fails.
+    Returns exit code 0 if violation count matches NumExpectedViolations, 1 otherwise.
 #>
 
 param(
     [Parameter(Mandatory=$true)]
-    [string]$TestFolder
+    [string]$TestFolder,
+
+    [Parameter(Mandatory=$false)]
+    [int]$NumExpectedViolations = 0
 )
 
 # Set error action preference
@@ -36,6 +43,9 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Timed Test Suite Validation" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Test Folder: $TestFolder" -ForegroundColor White
+if ($NumExpectedViolations -gt 0) {
+    Write-Host "Expected Violations: $NumExpectedViolations" -ForegroundColor White
+}
 Write-Host ""
 
 # Get all integration test files in the folder
@@ -113,9 +123,12 @@ if ($filesWithViolations.Count -gt 0) {
     Write-Host "TIMED_TEST_SUITE_CLEANUP from c_pal/timed_test_suite.h to allow" -ForegroundColor Cyan
     Write-Host "dumps to be collected if the test hangs." -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "[VALIDATION FAILED]" -ForegroundColor Red
-    exit 1
 }
 
-Write-Host "[VALIDATION PASSED]" -ForegroundColor Green
-exit 0
+if ($filesWithViolations.Count -eq $NumExpectedViolations) {
+    Write-Host "[VALIDATION PASSED]" -ForegroundColor Green
+    exit 0
+} else {
+    Write-Host "[VALIDATION FAILED] Expected $NumExpectedViolations violation(s), found $($filesWithViolations.Count)" -ForegroundColor Red
+    exit 1
+}

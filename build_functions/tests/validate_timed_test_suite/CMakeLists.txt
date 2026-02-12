@@ -4,28 +4,22 @@
 #
 # Timed Test Suite Validation Tests
 #
-# Tests the validate_timed_test_suite.ps1 script to ensure it correctly detects
-# integration test files using non-timed TEST_SUITE_INITIALIZE/CLEANUP macros.
+# Tests the validate_timed_test_suite CMake function and underlying script.
 #
 
-set(POWERSHELL_EXECUTABLE "powershell.exe")
-set(VALIDATE_TIMED_TEST_SUITE_SCRIPT "${trsw_internal_dir}/scripts/validate_timed_test_suite.ps1")
+# Test 1: Clean files pass validation (0 expected violations)
+validate_timed_test_suite(no_violations)
 
-# Test 1: Verify script detects non-timed macros in files that have them
-add_custom_target(test_validate_timed_test_suite_detection
-    COMMAND ${POWERSHELL_EXECUTABLE} -ExecutionPolicy Bypass -File "${VALIDATE_TIMED_TEST_SUITE_SCRIPT}"
-        -TestFolder "${CMAKE_CURRENT_SOURCE_DIR}/has_violations"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Testing timed test suite detection on files with non-timed macros"
-)
+# Test 2: Detection of violations (3 files with violations expected)
+validate_timed_test_suite(has_violations NUM_EXPECTED_VIOLATIONS 3)
 
-# Test 2: Verify script passes on files already using timed macros
-add_custom_target(test_validate_timed_test_suite_clean
-    COMMAND ${POWERSHELL_EXECUTABLE} -ExecutionPolicy Bypass -File "${VALIDATE_TIMED_TEST_SUITE_SCRIPT}"
-        -TestFolder "${CMAKE_CURRENT_SOURCE_DIR}/no_violations"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Testing timed test suite validation on clean files"
-)
+# Test 3: Skip regex causes check to be skipped
+set(timed_test_suite_skip_regex "skipped_folder_int")
+validate_timed_test_suite(skipped_folder_int)
+if(TARGET skipped_folder_int_timed_suite_check)
+    message(FATAL_ERROR "skipped_folder_int should have been skipped by regex but target was created")
+endif()
+unset(timed_test_suite_skip_regex)
 
 # Master target for all timed test suite validation tests
 add_custom_target(test_validate_timed_test_suite
@@ -33,9 +27,6 @@ add_custom_target(test_validate_timed_test_suite
 )
 
 add_dependencies(test_validate_timed_test_suite
-    test_validate_timed_test_suite_clean
+    no_violations_timed_suite_check
+    has_violations_timed_suite_check
 )
-
-# Note: We don't add test_validate_timed_test_suite_detection as a dependency because
-# it should fail with exit code 1 (which would fail the build).
-# Instead, it's available to run manually to verify detection works.

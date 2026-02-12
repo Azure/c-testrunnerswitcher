@@ -346,7 +346,17 @@ endfunction()
 
 # Validates that *_int.c files in test_folder use TIMED_TEST_SUITE_INITIALIZE/CLEANUP.
 # Skip specific folders: cmake -Dtimed_test_suite_skip_regex="module_a_int|module_b_int"
+# Optional: NUM_EXPECTED_VIOLATIONS <n> - expected number of files with violations (default 0)
 function(validate_timed_test_suite test_folder)
+    set(options)
+    set(oneValueArgs NUM_EXPECTED_VIOLATIONS)
+    set(multiValueArgs)
+    cmake_parse_arguments(arg "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(NOT DEFINED arg_NUM_EXPECTED_VIOLATIONS)
+        set(arg_NUM_EXPECTED_VIOLATIONS 0)
+    endif()
+
     # Allow skipping via regex
     if(DEFINED timed_test_suite_skip_regex AND NOT "${timed_test_suite_skip_regex}" STREQUAL "")
         if("${test_folder}" MATCHES "${timed_test_suite_skip_regex}")
@@ -360,6 +370,7 @@ function(validate_timed_test_suite test_folder)
             COMMAND powershell.exe -ExecutionPolicy Bypass
                 -File "${script_path}"
                 -TestFolder "${CMAKE_CURRENT_SOURCE_DIR}/${test_folder}"
+                -NumExpectedViolations ${arg_NUM_EXPECTED_VIOLATIONS}
             COMMENT "Validating timed test suite in ${test_folder}"
             VERBATIM
         )

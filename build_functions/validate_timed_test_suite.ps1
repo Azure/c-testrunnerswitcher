@@ -6,47 +6,38 @@
     Validates that integration test files use TIMED_TEST_SUITE_INITIALIZE/CLEANUP macros.
 
 .DESCRIPTION
-    This script checks all integration test files (*_int.c) to ensure they use the timed
-    versions of TEST_SUITE_INITIALIZE and TEST_SUITE_CLEANUP macros. The timed macros
-    (TIMED_TEST_SUITE_INITIALIZE / TIMED_TEST_SUITE_CLEANUP) wrap the vanilla versions
-    with a process watchdog that crashes the process and produces a dump on timeout,
-    allowing dumps to be collected if the test hangs.
-
-    The script automatically excludes dependency directories to avoid modifying third-party code.
+    This script checks integration test files (*_int.c) in a given test folder to ensure
+    they use the timed versions of TEST_SUITE_INITIALIZE and TEST_SUITE_CLEANUP macros.
+    The timed macros (TIMED_TEST_SUITE_INITIALIZE / TIMED_TEST_SUITE_CLEANUP) wrap the
+    vanilla versions with a process watchdog that crashes the process and produces a dump
+    on timeout, allowing dumps to be collected if the test hangs.
 
     When the -Fix switch is provided, the script will automatically replace the vanilla
     macros with their timed equivalents and add the required include if not present.
 
-.PARAMETER RepoRoot
-    The root directory of the repository to validate.
-
-.PARAMETER ExcludeFolders
-    Comma-separated list of additional folders to exclude from validation.
+.PARAMETER TestFolder
+    The path to the test folder to validate.
 
 .PARAMETER Fix
     If specified, automatically replace TEST_SUITE_INITIALIZE/CLEANUP with timed versions.
 
 .EXAMPLE
-    .\validate_timed_test_suite.ps1 -RepoRoot "C:\repo"
+    .\validate_timed_test_suite.ps1 -TestFolder "C:\repo\tests\my_module_int"
 
-    Validates all integration test files and reports files using non-timed macros.
+    Validates integration test files in the folder and reports files using non-timed macros.
 
 .EXAMPLE
-    .\validate_timed_test_suite.ps1 -RepoRoot "C:\repo" -Fix
+    .\validate_timed_test_suite.ps1 -TestFolder "C:\repo\tests\my_module_int" -Fix
 
     Validates and automatically replaces non-timed macros with timed versions.
 
 .NOTES
     Returns exit code 0 if all files are valid (or were fixed), 1 if validation fails.
-    Dependencies in deps/ and dependencies/ directories are automatically excluded.
 #>
 
 param(
     [Parameter(Mandatory=$true)]
-    [string]$RepoRoot,
-
-    [Parameter(Mandatory=$false)]
-    [string]$ExcludeFolders = "deps,cmake",
+    [string]$TestFolder,
 
     [Parameter(Mandatory=$false)]
     [switch]$Fix
@@ -58,25 +49,18 @@ $ErrorActionPreference = "Stop"
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Timed Test Suite Validation" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Repository Root: $RepoRoot" -ForegroundColor White
+Write-Host "Test Folder: $TestFolder" -ForegroundColor White
 Write-Host "Fix Mode: $($Fix.IsPresent)" -ForegroundColor White
-Write-Host ""
-
-# Parse excluded directories (default: deps, cmake)
-$excludeDirs = $ExcludeFolders -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
-
-Write-Host "Excluded directories: $($excludeDirs -join ', ')" -ForegroundColor White
 Write-Host ""
 
 # Initialize counters
 $totalFiles = 0
 $filesWithViolations = @()
 $fixedFiles = @()
-$skippedFiles = 0
 
-# Get all integration test files in the repository
+# Get all integration test files in the folder
 Write-Host "Searching for integration test files (*_int.c)..." -ForegroundColor White
-$allFiles = @(Get-ChildItem -Path $RepoRoot -Recurse -Filter "*_int.c" -ErrorAction SilentlyContinue)
+$allFiles = @(Get-ChildItem -Path $TestFolder -Recurse -Filter "*_int.c" -ErrorAction SilentlyContinue)
 
 Write-Host "Found $($allFiles.Count) integration test files to check" -ForegroundColor White
 Write-Host ""
@@ -86,27 +70,7 @@ Write-Host ""
 $initPattern = '(?<!TIMED_)TEST_SUITE_INITIALIZE\s*\('
 $cleanupPattern = '(?<!TIMED_)TEST_SUITE_CLEANUP\s*\('
 
-# Exception comment pattern - if found on a matching line, the entire file is exempted
-$exceptionPattern = '//\s*no-timed-test-suite'
-
 foreach ($file in $allFiles) {
-    # Check if file should be excluded
-    $relativePath = $file.FullName.Substring($RepoRoot.Length).TrimStart('\', '/')
-    $isExcluded = $false
-
-    foreach ($excludeDir in $excludeDirs) {
-        # Check both path separator types for compatibility
-        if ($relativePath -like "$excludeDir\*" -or $relativePath -like "$excludeDir/*") {
-            $isExcluded = $true
-            $skippedFiles++
-            break
-        }
-    }
-
-    if ($isExcluded) {
-        continue
-    }
-
     $totalFiles++
 
     # Read file content as lines
@@ -118,26 +82,16 @@ foreach ($file in $allFiles) {
         continue
     }
 
-    # First pass: check for exception comment on any matching line
-    $isExempted = $false
     $matchingLines = @()
     $lineNumber = 0
     foreach ($line in $lines) {
         $lineNumber++
         if ($line -match $initPattern -or $line -match $cleanupPattern) {
-            if ($line -match $exceptionPattern) {
-                $isExempted = $true
-                break
-            }
             $matchingLines += [PSCustomObject]@{
                 LineNumber = $lineNumber
                 Content = $line.Trim()
             }
         }
-    }
-
-    if ($isExempted) {
-        continue
     }
 
     if ($matchingLines.Count -gt 0) {
@@ -176,8 +130,6 @@ foreach ($file in $allFiles) {
 
                     # Replace TEST_SUITE_INITIALIZE(name -> TIMED_TEST_SUITE_INITIALIZE(name, TIMED_TEST_DEFAULT_TIMEOUT_MS
                     if ($currentLine -match $initPattern) {
-                        # Match: TEST_SUITE_INITIALIZE( name [, extra_args...] )
-                        # We need to insert TIMED_TEST_DEFAULT_TIMEOUT_MS as 2nd arg after the first arg
                         $currentLine = $currentLine -replace '(?<!TIMED_)TEST_SUITE_INITIALIZE\s*\(\s*(\w+)', 'TIMED_TEST_SUITE_INITIALIZE($1, TIMED_TEST_DEFAULT_TIMEOUT_MS'
                     }
 
@@ -215,7 +167,6 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Validation Summary" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Total integration test files checked: $totalFiles" -ForegroundColor White
-Write-Host "Files skipped (excluded directories): $skippedFiles" -ForegroundColor White
 
 if ($Fix -and $fixedFiles.Count -gt 0) {
     Write-Host "Files fixed successfully: $($fixedFiles.Count)" -ForegroundColor Green
@@ -226,7 +177,6 @@ if ($filesWithViolations.Count -gt 0 -and -not $Fix) {
     Write-Host ""
     Write-Host "The following files use TEST_SUITE_INITIALIZE/CLEANUP instead of timed versions:" -ForegroundColor Yellow
 
-    # Show all files
     foreach ($item in $filesWithViolations) {
         Write-Host "  - $($item.FilePath) ($($item.MatchCount) macro(s))" -ForegroundColor White
     }

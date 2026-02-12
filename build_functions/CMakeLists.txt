@@ -359,7 +359,7 @@ function(validate_timed_test_suite test_folder)
         add_custom_target(${test_folder}_timed_suite_check ALL
             COMMAND powershell.exe -ExecutionPolicy Bypass
                 -File "${script_path}"
-                -RepoRoot "${CMAKE_CURRENT_SOURCE_DIR}/${test_folder}"
+                -TestFolder "${CMAKE_CURRENT_SOURCE_DIR}/${test_folder}"
             COMMENT "Validating timed test suite in ${test_folder}"
             VERBATIM
         )

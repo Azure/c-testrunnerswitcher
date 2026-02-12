@@ -15,7 +15,7 @@ set(VALIDATE_TIMED_TEST_SUITE_SCRIPT "${trsw_internal_dir}/validate_timed_test_s
 # Test 1: Verify script detects non-timed macros in files that have them
 add_custom_target(test_validate_timed_test_suite_detection
     COMMAND ${POWERSHELL_EXECUTABLE} -ExecutionPolicy Bypass -File "${VALIDATE_TIMED_TEST_SUITE_SCRIPT}"
-        -RepoRoot "${CMAKE_CURRENT_SOURCE_DIR}/has_violations"
+        -TestFolder "${CMAKE_CURRENT_SOURCE_DIR}/has_violations"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Testing timed test suite detection on files with non-timed macros"
 )
@@ -23,7 +23,7 @@ add_custom_target(test_validate_timed_test_suite_detection
 # Test 2: Verify script passes on files already using timed macros
 add_custom_target(test_validate_timed_test_suite_clean
     COMMAND ${POWERSHELL_EXECUTABLE} -ExecutionPolicy Bypass -File "${VALIDATE_TIMED_TEST_SUITE_SCRIPT}"
-        -RepoRoot "${CMAKE_CURRENT_SOURCE_DIR}/no_violations"
+        -TestFolder "${CMAKE_CURRENT_SOURCE_DIR}/no_violations"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Testing timed test suite validation on clean files"
 )
@@ -37,11 +37,11 @@ add_custom_target(test_validate_timed_test_suite_fix
         "${CMAKE_CURRENT_BINARY_DIR}/temp_fix_test"
     # Run the script with fix mode
     COMMAND ${POWERSHELL_EXECUTABLE} -ExecutionPolicy Bypass -File "${VALIDATE_TIMED_TEST_SUITE_SCRIPT}"
-        -RepoRoot "${CMAKE_CURRENT_BINARY_DIR}/temp_fix_test"
+        -TestFolder "${CMAKE_CURRENT_BINARY_DIR}/temp_fix_test"
         -Fix
     # Verify violations were fixed (script should pass now)
     COMMAND ${POWERSHELL_EXECUTABLE} -ExecutionPolicy Bypass -File "${VALIDATE_TIMED_TEST_SUITE_SCRIPT}"
-        -RepoRoot "${CMAKE_CURRENT_BINARY_DIR}/temp_fix_test"
+        -TestFolder "${CMAKE_CURRENT_BINARY_DIR}/temp_fix_test"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Testing timed test suite fix functionality"
 )
@@ -55,7 +55,7 @@ add_custom_target(test_validate_timed_test_suite_fix_multi_arg
         "${CMAKE_CURRENT_BINARY_DIR}/temp_multi_arg_test/"
     # Run the script with fix mode
     COMMAND ${POWERSHELL_EXECUTABLE} -ExecutionPolicy Bypass -File "${VALIDATE_TIMED_TEST_SUITE_SCRIPT}"
-        -RepoRoot "${CMAKE_CURRENT_BINARY_DIR}/temp_multi_arg_test"
+        -TestFolder "${CMAKE_CURRENT_BINARY_DIR}/temp_multi_arg_test"
         -Fix
     # Compare the result with the expected file
     COMMAND ${CMAKE_COMMAND} -E compare_files
@@ -74,7 +74,7 @@ add_custom_target(test_validate_timed_test_suite_fix_basic
         "${CMAKE_CURRENT_BINARY_DIR}/temp_basic_test/"
     # Run the script with fix mode
     COMMAND ${POWERSHELL_EXECUTABLE} -ExecutionPolicy Bypass -File "${VALIDATE_TIMED_TEST_SUITE_SCRIPT}"
-        -RepoRoot "${CMAKE_CURRENT_BINARY_DIR}/temp_basic_test"
+        -TestFolder "${CMAKE_CURRENT_BINARY_DIR}/temp_basic_test"
         -Fix
     # Compare the result with the expected file
     COMMAND ${CMAKE_COMMAND} -E compare_files
@@ -93,7 +93,7 @@ add_custom_target(test_validate_timed_test_suite_fix_no_duplicate_include
         "${CMAKE_CURRENT_BINARY_DIR}/temp_no_dup_include_test/"
     # Run the script with fix mode
     COMMAND ${POWERSHELL_EXECUTABLE} -ExecutionPolicy Bypass -File "${VALIDATE_TIMED_TEST_SUITE_SCRIPT}"
-        -RepoRoot "${CMAKE_CURRENT_BINARY_DIR}/temp_no_dup_include_test"
+        -TestFolder "${CMAKE_CURRENT_BINARY_DIR}/temp_no_dup_include_test"
         -Fix
     # Compare the result with the expected file (should NOT have duplicate include)
     COMMAND ${CMAKE_COMMAND} -E compare_files

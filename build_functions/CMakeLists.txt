@@ -344,6 +344,39 @@ function(build_exe whatIsBuilding solution_folder custom_main)
     endif()
 endfunction()
 
+# Validates that *_int.c files in test_folder use TIMED_TEST_SUITE_INITIALIZE/CLEANUP.
+# Skip specific folders: cmake -Dtimed_test_suite_skip_regex="module_a_int|module_b_int"
+# Optional: NUM_EXPECTED_VIOLATIONS <n> - expected number of files with violations (default 0)
+function(validate_timed_test_suite test_folder)
+    set(options)
+    set(oneValueArgs NUM_EXPECTED_VIOLATIONS)
+    set(multiValueArgs)
+    cmake_parse_arguments(arg "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(NOT DEFINED arg_NUM_EXPECTED_VIOLATIONS)
+        set(arg_NUM_EXPECTED_VIOLATIONS 0)
+    endif()
+
+    # Allow skipping via regex
+    if(DEFINED timed_test_suite_skip_regex AND NOT "${timed_test_suite_skip_regex}" STREQUAL "")
+        if("${test_folder}" MATCHES "${timed_test_suite_skip_regex}")
+            return()
+        endif()
+    endif()
+
+    set(script_path "${trsw_internal_dir}/scripts/validate_timed_test_suite.ps1")
+    if(EXISTS "${script_path}")
+        add_custom_target(${test_folder}_timed_suite_check ALL
+            COMMAND powershell.exe -ExecutionPolicy Bypass
+                -File "${script_path}"
+                -TestFolder "${CMAKE_CURRENT_SOURCE_DIR}/${test_folder}"
+                -NumExpectedViolations ${arg_NUM_EXPECTED_VIOLATIONS}
+            COMMENT "Validating timed test suite in ${test_folder}"
+            VERBATIM
+        )
+    endif()
+endfunction()
+
 #drop in replacement for add_subdirectory :)
 #test_folder is the name of a folder that exists on the drive. For example "clds_hash_table_ut". It is not a complete path.
 function(build_test_folder test_folder)
@@ -367,6 +400,11 @@ function(build_test_folder test_folder)
         if ((${use_cppunittest}) AND (WIN32))
             set(building dll)
             add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})
+        endif()
+
+        # Validate timed test suite for integration tests
+        if(WIN32 AND ("${test_folder}" MATCHES ".*int.*"))
+            validate_timed_test_suite(${test_folder})
         endif()
     else()
         #message("test_folder is ${test_folder} NOT BUILDING")
@@ -404,3 +442,7 @@ function(build_test_artifacts_with_custom_main whatIsBuilding solution_folder )
         MESSAGE(FATAL_ERROR "not an expected value: building=${building} test_folder=${test_folder} ARGN=${ARGN}")
     endif()
 endfunction()
+
+if(${run_unittests})
+    add_subdirectory(tests/validate_timed_test_suite)
+endif()

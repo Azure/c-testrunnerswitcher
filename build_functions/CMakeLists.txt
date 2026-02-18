@@ -319,6 +319,10 @@ function(build_exe whatIsBuilding solution_folder custom_main)
         target_link_libraries(${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME} testrunnerswitcher)
     endif()
 
+    if(${use_vld})
+        copy_default_vld_ini(${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME} $<TARGET_FILE_DIR:${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}>)
+    endif()
+
     #register the exe with ctest's list of tests
     add_test(NAME ${whatIsBuilding} COMMAND ${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME})
 

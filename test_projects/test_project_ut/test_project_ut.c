@@ -40,7 +40,7 @@ TEST_FUNCTION(a) // no-srs // no-aaa
  * Tests that addition works correctly for various inputs
  */
 PARAMETERIZED_TEST_FUNCTION(test_addition,
-    ARGS(int, a, int, b, int, expected),
+    (int, a, int, b, int, expected),
     CASE((0, 0, 0), with_zeros),
     CASE((1, 2, 3), with_small_positive_numbers),
     CASE((-1, 1, 0), with_negative_and_positive),
@@ -59,7 +59,7 @@ PARAMETERIZED_TEST_FUNCTION(test_addition,
  * Example 2: Parameterized test with 2 parameters for multiplication
  */
 PARAMETERIZED_TEST_FUNCTION(test_multiplication,
-    ARGS(int, x, int, y, int, expected_product),
+    (int, x, int, y, int, expected_product),
     CASE((0, 5, 0), with_zero),
     CASE((1, 1, 1), with_ones),
     CASE((2, 3, 6), with_small_numbers),
@@ -76,7 +76,7 @@ PARAMETERIZED_TEST_FUNCTION(test_multiplication,
  * Example 3: Parameterized test with single parameter
  */
 PARAMETERIZED_TEST_FUNCTION(test_is_positive,
-    ARGS(int, value, int, expected_is_positive),
+    (int, value, int, expected_is_positive),
     CASE((1, 1), for_positive_one),
     CASE((100, 1), for_hundred),
     CASE((0, 0), for_zero),

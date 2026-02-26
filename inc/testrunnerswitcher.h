@@ -28,7 +28,7 @@ typedef void* TEST_MUTEX_HANDLE;
  *
  * Usage:
  *   PARAMETERIZED_TEST_FUNCTION(base_name,
- *       (type1, param1, type2, param2),
+ *       ARGS(type1, param1, type2, param2),
  *       CASE((value1, value2), suffix1),
  *       CASE((value3, value4), suffix2))
  *   {
@@ -42,7 +42,7 @@ typedef void* TEST_MUTEX_HANDLE;
  *
  * Example:
  *   PARAMETERIZED_TEST_FUNCTION(test_addition,
- *       (int, a, int, b, int, expected),
+ *       ARGS(int, a, int, b, int, expected),
  *       CASE((1, 2, 3), when_adding_1_and_2),
  *       CASE((0, 0, 0), when_adding_zeros))
  *   {
@@ -53,15 +53,18 @@ typedef void* TEST_MUTEX_HANDLE;
 /* Strip parentheses: PARAMETERIZED_TEST_STRIP_PARENS (a, b) => a, b */
 #define PARAMETERIZED_TEST_STRIP_PARENS(...) __VA_ARGS__
 
+/* Token-paste trick: ARGS(type1, name1, ...) => type1, name1, ... without defining ARGS as a macro */
+#define PARAMETERIZED_TEST_EXPAND_ARGS_ARGS(...) __VA_ARGS__
+
 /* Emit ", type name" for each pair after the first */
 #define PARAMETERIZED_TEST_ARGS_COMMA(type, name) , type name
 
 /* Convert a flat type, name, ... list into parameter declarations: type1 name1, type2 name2, ... */
 #define PARAMETERIZED_TEST_ARGS_DECL_IMPL(t1, n1, ...) t1 n1 __VA_OPT__(MU_FOR_EACH_2(PARAMETERIZED_TEST_ARGS_COMMA, __VA_ARGS__))
 
-/* Strip outer parens from the args group then forward to IMPL */
+/* Expand ARGS(...) via token paste then forward to IMPL */
 #define PARAMETERIZED_TEST_ARGS_DECL_EXPAND(...) PARAMETERIZED_TEST_ARGS_DECL_IMPL(__VA_ARGS__)
-#define PARAMETERIZED_TEST_ARGS_DECL(args) PARAMETERIZED_TEST_ARGS_DECL_EXPAND(PARAMETERIZED_TEST_STRIP_PARENS args)
+#define PARAMETERIZED_TEST_ARGS_DECL(args) PARAMETERIZED_TEST_ARGS_DECL_EXPAND(MU_C2B(PARAMETERIZED_TEST_EXPAND_ARGS_, args))
 
 /* Generate a single TEST_FUNCTION wrapper for one CASE */
 #define PARAMETERIZED_TEST_WRAPPER_IMPL(base_name, values, suffix) \

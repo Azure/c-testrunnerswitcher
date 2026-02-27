@@ -30,14 +30,11 @@ static int g_accumulated_sum;
 
 BEGIN_TEST_SUITE(parameterized_tests_ut)
 
-TEST_SUITE_INITIALIZE(suite_init) // no-srs
+TEST_SUITE_INITIALIZE(suite_init)
 {
-    // arrange
-    // act
-    // assert
 }
 
-TEST_SUITE_CLEANUP(suite_cleanup) // no-srs
+TEST_SUITE_CLEANUP(suite_cleanup)
 {
     /* assert - verify that the parameterized test cases for test_verify_calls were all executed */
     /* 4 cases: (1,10), (2,20), (3,30), (4,40) => call_count=4, accumulated_sum = 11+22+33+44 = 110 */
@@ -45,18 +42,12 @@ TEST_SUITE_CLEANUP(suite_cleanup) // no-srs
     ASSERT_ARE_EQUAL(int, 110, g_accumulated_sum, "Expected accumulated sum of 110, but got %d", g_accumulated_sum);
 }
 
-TEST_FUNCTION_INITIALIZE(test_init) // no-srs
+TEST_FUNCTION_INITIALIZE(test_init)
 {
-    // arrange
-    // act
-    // assert
 }
 
-TEST_FUNCTION_CLEANUP(test_cleanup) // no-srs
+TEST_FUNCTION_CLEANUP(test_cleanup)
 {
-    // arrange
-    // act
-    // assert
 }
 
 /*

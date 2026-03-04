@@ -3,6 +3,8 @@
 
 set(trsw_internal_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
+option(add_profile_linker_flag "Enable /PROFILE linker flag for test targets (needed for some code coverage tools, may significantly increase test execution time under VSTest with code coverage)" OFF)
+
 #build_lib produces a lib that can be used with an exe and/or dll for testing
 #ARGN have the format
 #ADDITIONAL_LIBS list of libraries. The libraries is a list consisting of repeating the following:
@@ -30,7 +32,7 @@ function(build_lib whatIsBuilding solution_folder)
            PROPERTIES
            FOLDER ${solution_folder})
 
-    if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug") # setting /PROFILE with RelWithDebInfo causes "unreachable code" errors
+    if(add_profile_linker_flag AND WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug") # setting /PROFILE with RelWithDebInfo causes "unreachable code" errors
         set_target_properties(${whatIsBuilding}_lib_${CMAKE_PROJECT_NAME}
                PROPERTIES
                LINK_FLAGS "/PROFILE") #needed for code coverage
@@ -240,7 +242,7 @@ function(build_dll whatIsBuilding solution_folder custom_main)
                PROPERTIES
                FOLDER ${solution_folder})
 
-    if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug") # setting /PROFILE with RelWithDebInfo causes "unreachable code" errors
+    if(add_profile_linker_flag AND WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug") # setting /PROFILE with RelWithDebInfo causes "unreachable code" errors
         set_target_properties(${whatIsBuilding}_dll_${CMAKE_PROJECT_NAME}
                PROPERTIES
                LINK_FLAGS "/PROFILE") #needed for code coverage
@@ -291,7 +293,7 @@ function(build_exe whatIsBuilding solution_folder custom_main)
                PROPERTIES
                FOLDER ${solution_folder})
 
-    if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug") # setting /PROFILE with RelWithDebInfo causes "unreachable code" errors
+    if(add_profile_linker_flag AND WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug") # setting /PROFILE with RelWithDebInfo causes "unreachable code" errors
         set_target_properties(${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}
                PROPERTIES
                LINK_FLAGS "/PROFILE") #needed for code coverage

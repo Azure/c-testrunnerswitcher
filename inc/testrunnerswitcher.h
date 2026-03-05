@@ -35,16 +35,33 @@ typedef void* TEST_MUTEX_HANDLE;
 // These macros support optional variadic fixture functions that are passed through to CTEST_SUITE_*/CTEST_FUNCTION_*.
 // For INITIALIZE macros: cppunittest mutex fixture runs first, then any user-provided fixtures.
 // For CLEANUP macros: user-provided fixtures run first, then cppunittest mutex fixture runs last.
-#define TEST_SUITE_INITIALIZE(name, ...)     CTEST_SUITE_INITIALIZE(name, cppunittest_mutex_fixtures_suite_init, ##__VA_ARGS__)
-#define TEST_SUITE_CLEANUP(name, ...)        CTEST_SUITE_CLEANUP(name, ##__VA_ARGS__, cppunittest_mutex_fixtures_suite_cleanup)
+// TEST_SUITE_INITIALIZE_INTERNAL and TEST_SUITE_CLEANUP_INTERNAL are guarded behind DEFINE_TEST_SUITE_INITIALIZE/DEFINE_TEST_SUITE_CLEANUP.
+// They are not intended for direct use by test code. Use the appropriate wrapper macros instead,
+// which define these guards internally before including this header.
+#ifdef DEFINE_TEST_SUITE_INITIALIZE
+#define TEST_SUITE_INITIALIZE_INTERNAL(name, ...)     CTEST_SUITE_INITIALIZE(name, cppunittest_mutex_fixtures_suite_init, ##__VA_ARGS__)
+#endif
+
+#ifdef DEFINE_TEST_SUITE_CLEANUP
+#define TEST_SUITE_CLEANUP_INTERNAL(name, ...)        CTEST_SUITE_CLEANUP(name, ##__VA_ARGS__, cppunittest_mutex_fixtures_suite_cleanup)
+#endif
 #define TEST_FUNCTION_INITIALIZE(name, ...)  CTEST_FUNCTION_INITIALIZE(name, cppunittest_mutex_fixtures_function_init, ##__VA_ARGS__)
 #define TEST_FUNCTION_CLEANUP(name, ...)     CTEST_FUNCTION_CLEANUP(name, ##__VA_ARGS__, cppunittest_mutex_fixtures_function_cleanup)
 
 #else
 
 // These macros support optional variadic fixture functions that are passed through to CTEST_SUITE_*/CTEST_FUNCTION_*.
-#define TEST_SUITE_INITIALIZE(name, ...)     CTEST_SUITE_INITIALIZE(name, ##__VA_ARGS__)
-#define TEST_SUITE_CLEANUP(name, ...)        CTEST_SUITE_CLEANUP(name, ##__VA_ARGS__)
+// TEST_SUITE_INITIALIZE_INTERNAL and TEST_SUITE_CLEANUP_INTERNAL are guarded behind DEFINE_TEST_SUITE_INITIALIZE/DEFINE_TEST_SUITE_CLEANUP.
+// They are not intended for direct use by test code. Use the appropriate wrapper macros instead,
+// which define these guards internally before including this header.
+#ifdef DEFINE_TEST_SUITE_INITIALIZE
+#define TEST_SUITE_INITIALIZE_INTERNAL(name, ...)     CTEST_SUITE_INITIALIZE(name, ##__VA_ARGS__)
+#endif
+
+#ifdef DEFINE_TEST_SUITE_CLEANUP
+#define TEST_SUITE_CLEANUP_INTERNAL(name, ...)        CTEST_SUITE_CLEANUP(name, ##__VA_ARGS__)
+#endif
+
 #define TEST_FUNCTION_INITIALIZE(name, ...)  CTEST_FUNCTION_INITIALIZE(name, ##__VA_ARGS__)
 #define TEST_FUNCTION_CLEANUP(name, ...)     CTEST_FUNCTION_CLEANUP(name, ##__VA_ARGS__)
 

@@ -326,7 +326,9 @@ function(build_exe whatIsBuilding solution_folder custom_main)
     endif()
 
     #register the exe with ctest's list of tests
-    add_test(NAME ${whatIsBuilding} COMMAND ${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME})
+    #WORKING_DIRECTORY is set to the exe's output folder so that DbgHelp (SymInitialize)
+    #can find PDB files when the test is run on a different agent than where it was built.
+    add_test(NAME ${whatIsBuilding} COMMAND ${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME} WORKING_DIRECTORY $<TARGET_FILE_DIR:${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}>)
 
     if(UNIX) #LINUX OR APPLE
         if(${run_valgrind} OR ${run_helgrind} OR ${run_drd})

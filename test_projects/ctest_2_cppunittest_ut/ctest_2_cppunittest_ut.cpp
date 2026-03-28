@@ -28,4 +28,9 @@ static int compile_time_check_CTEST_2_CPPUNITTEST_MemberMethodInfo_size[sizeof(C
 
 BEGIN_TEST_SUITE(ctest_2_cppunittest_ut)
 
+TEST_FUNCTION(ctest_2_cppunittest_compile_time_checks_pass) // no-srs // no-aaa
+{
+    // compile-time size checks in the CPP_UNITTEST section above are the real validation
+}
+
 END_TEST_SUITE(ctest_2_cppunittest_ut)

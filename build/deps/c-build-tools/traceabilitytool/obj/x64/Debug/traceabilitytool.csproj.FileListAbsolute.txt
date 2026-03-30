@@ -1,7 +1,0 @@
-c:\src\04_bot\bin\Debug\traceabilitytool.exe
-c:\src\04_bot\bin\Debug\traceabilitytool.pdb
-C:\src\04_bot\c-testrunnerswitcher\build\deps\c-build-tools\traceabilitytool\obj\x64\Debug\traceabilitytool.csproj.AssemblyReference.cache
-C:\src\04_bot\c-testrunnerswitcher\build\deps\c-build-tools\traceabilitytool\obj\x64\Debug\traceabilitytool.csproj.CoreCompileInputs.cache
-C:\src\04_bot\c-testrunnerswitcher\build\deps\c-build-tools\traceabilitytool\obj\x64\Debug\traceabi.2B15612F.Up2Date
-C:\src\04_bot\c-testrunnerswitcher\build\deps\c-build-tools\traceabilitytool\obj\x64\Debug\traceabilitytool.exe
-C:\src\04_bot\c-testrunnerswitcher\build\deps\c-build-tools\traceabilitytool\obj\x64\Debug\traceabilitytool.pdb

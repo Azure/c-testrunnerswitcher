@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<BuildType Name="MinSizeRel"/>
+		<BuildType Name="RelWithDebInfo"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Project Path="build_functions/c_build_functions.vcxproj" Id="12746d08-ebb1-35f6-8d92-637031a8f494">
+		<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="c_build_tools.vcxproj" Id="6f766172-8a7d-39bb-9310-cc3e779a7309">
+		<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="reals_check/reals_check.vcxproj" Id="ad1e7bab-d9d6-3fe3-b62c-860b08e312cf">
+		<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="traceabilitytool/traceabilitytool.csproj" Id="25b5a384-023c-362c-8e2f-447b702aa7b3">
+		<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+		<Platform Project="x64"/>
+	</Project>
+	<Folder Name="/CMakePredefinedTargets/">
+		<Project Path="ALL_BUILD.vcxproj" Id="2406cdf5-519a-3875-9988-83aa78347c71">
+			<BuildDependency Project="sarif_results_checker/Azure.Messaging.SarifResultsChecker.csproj"/>
+			<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+			<BuildDependency Project="traceabilitytool/traceabilitytool.csproj"/>
+		</Project>
+		<Project Path="INSTALL.vcxproj" Id="d5096853-4d6a-3cac-95a7-dbcccb57b0c4">
+			<BuildDependency Project="ALL_BUILD.vcxproj"/>
+			<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+			<Build Solution="Debug|*" Project="false"/>
+			<Build Solution="Release|*" Project="false"/>
+			<Build Solution="MinSizeRel|*" Project="false"/>
+			<Build Solution="RelWithDebInfo|*" Project="false"/>
+		</Project>
+		<Project Path="RUN_TESTS.vcxproj" Id="6b08e73e-325c-36ba-9a44-0a1ef977685e">
+			<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+			<Build Solution="Debug|*" Project="false"/>
+			<Build Solution="Release|*" Project="false"/>
+			<Build Solution="MinSizeRel|*" Project="false"/>
+			<Build Solution="RelWithDebInfo|*" Project="false"/>
+		</Project>
+		<Project Path="../../ZERO_CHECK.vcxproj" Id="4e18a605-0c15-32e4-a1fd-1cceb1d35539"/>
+	</Folder>
+	<Folder Name="/tools/">
+		<Project Path="sarif_results_checker/Azure.Messaging.SarifResultsChecker.csproj" Id="1d478422-22bb-3796-af56-22ceca468f59">
+			<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+			<Platform Project="x64"/>
+		</Project>
+	</Folder>
+</Solution>

@@ -1,0 +1,64 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\src\\04_bot\\c-testrunnerswitcher\\build\\deps\\c-build-tools\\traceabilitytool\\traceabilitytool.csproj": {}
+  },
+  "projects": {
+    "C:\\src\\04_bot\\c-testrunnerswitcher\\build\\deps\\c-build-tools\\traceabilitytool\\traceabilitytool.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\src\\04_bot\\c-testrunnerswitcher\\build\\deps\\c-build-tools\\traceabilitytool\\traceabilitytool.csproj",
+        "projectName": "traceabilitytool",
+        "projectPath": "C:\\src\\04_bot\\c-testrunnerswitcher\\build\\deps\\c-build-tools\\traceabilitytool\\traceabilitytool.csproj",
+        "packagesPath": "C:\\Users\\mdurak\\.nuget\\packages\\",
+        "outputPath": "C:\\src\\04_bot\\c-testrunnerswitcher\\build\\deps\\c-build-tools\\traceabilitytool\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "UsingMicrosoftNETSdk": false,
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\mdurak\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net481"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net481": {
+            "projectReferences": {}
+          }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net481": {
+          "dependencies": {
+            "DocumentFormat.OpenXml": {
+              "target": "Package",
+              "version": "[2.9.1, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

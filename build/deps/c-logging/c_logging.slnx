@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<BuildType Name="MinSizeRel"/>
+		<BuildType Name="RelWithDebInfo"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Project Path="v2/c_logging_v2.vcxproj" Id="8833a53d-3102-3df9-8b8c-848dd282aa13">
+		<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="v2/c_logging_v2_core.vcxproj"/>
+		<BuildDependency Project="../macro-utils-c/macro_utils_c.vcxproj"/>
+	</Project>
+	<Project Path="v2/c_logging_v2_core.vcxproj" Id="2b04f059-690c-3911-acf9-57457a976a70">
+		<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="../macro-utils-c/macro_utils_c.vcxproj"/>
+	</Project>
+	<Project Path="../macro-utils-c/macro_utils_c.vcxproj" Id="3f33ecf1-0e4a-3da0-a45e-5d8d343b9b43">
+		<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Folder Name="/CMakePredefinedTargets/">
+		<Project Path="ALL_BUILD.vcxproj" Id="2406cdf5-519a-3875-9988-83aa78347c71">
+			<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+			<BuildDependency Project="v2/c_logging_v2.vcxproj"/>
+			<BuildDependency Project="v2/c_logging_v2_core.vcxproj"/>
+		</Project>
+		<Project Path="INSTALL.vcxproj" Id="d5096853-4d6a-3cac-95a7-dbcccb57b0c4">
+			<BuildDependency Project="ALL_BUILD.vcxproj"/>
+			<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+			<Build Solution="Debug|*" Project="false"/>
+			<Build Solution="Release|*" Project="false"/>
+			<Build Solution="MinSizeRel|*" Project="false"/>
+			<Build Solution="RelWithDebInfo|*" Project="false"/>
+		</Project>
+		<Project Path="RUN_TESTS.vcxproj" Id="6b08e73e-325c-36ba-9a44-0a1ef977685e">
+			<BuildDependency Project="../../ZERO_CHECK.vcxproj"/>
+			<Build Solution="Debug|*" Project="false"/>
+			<Build Solution="Release|*" Project="false"/>
+			<Build Solution="MinSizeRel|*" Project="false"/>
+			<Build Solution="RelWithDebInfo|*" Project="false"/>
+		</Project>
+		<Project Path="../../ZERO_CHECK.vcxproj" Id="4e18a605-0c15-32e4-a1fd-1cceb1d35539"/>
+	</Folder>
+</Solution>

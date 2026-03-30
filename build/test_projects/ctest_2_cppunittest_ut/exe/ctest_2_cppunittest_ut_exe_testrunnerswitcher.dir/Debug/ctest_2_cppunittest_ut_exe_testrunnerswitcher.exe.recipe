@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>C:\src\04_bot\c-testrunnerswitcher\build\x64\Debug\ZERO_CHECK</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\src\04_bot\c-testrunnerswitcher\build\Debug\ctest_2_cppunittest_ut_exe_testrunnerswitcher\ctest_2_cppunittest_ut_exe_testrunnerswitcher.exe</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles />
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

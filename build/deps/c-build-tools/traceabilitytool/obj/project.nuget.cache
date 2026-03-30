@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "MQb3D+t2znM=",
+  "success": true,
+  "projectFilePath": "C:\\src\\04_bot\\c-testrunnerswitcher\\build\\deps\\c-build-tools\\traceabilitytool\\traceabilitytool.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\mdurak\\.nuget\\packages\\documentformat.openxml\\2.9.1\\documentformat.openxml.2.9.1.nupkg.sha512",
+    "C:\\Users\\mdurak\\.nuget\\packages\\system.io.filesystem.primitives\\4.3.0\\system.io.filesystem.primitives.4.3.0.nupkg.sha512",
+    "C:\\Users\\mdurak\\.nuget\\packages\\system.io.packaging\\4.5.0\\system.io.packaging.4.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -20,12 +20,17 @@ extern "C" {
 #ifdef CPP_UNITTEST
 #include "cppunittest.h"
 using namespace ::Microsoft::VisualStudio::CppUnitTestFramework;
-
-// these 2 variable definitions check that the size of the structures in ctest and cppunittest are the same
-static int compile_time_check_CTEST_2_CPPUNITTEST_MethodMetadata_size[sizeof(CTEST_2_CPPUNITTEST_MethodMetadata) == sizeof(MethodMetadata) ? 1 : 0];
-static int compile_time_check_CTEST_2_CPPUNITTEST_MemberMethodInfo_size[sizeof(CTEST_2_CPPUNITTEST_MemberMethodInfo) == sizeof(MemberMethodInfo) ? 1 : 0];
 #endif
 
 BEGIN_TEST_SUITE(ctest_2_cppunittest_ut)
+
+TEST_FUNCTION(ctest_2_cppunittest_struct_sizes_match) // no-srs // no-aaa
+{
+#ifdef CPP_UNITTEST
+    // verify the sizes of the structures in ctest and cppunittest are the same
+    ASSERT_ARE_EQUAL(size_t, sizeof(MethodMetadata), sizeof(CTEST_2_CPPUNITTEST_MethodMetadata));
+    ASSERT_ARE_EQUAL(size_t, sizeof(MemberMethodInfo), sizeof(CTEST_2_CPPUNITTEST_MemberMethodInfo));
+#endif
+}
 
 END_TEST_SUITE(ctest_2_cppunittest_ut)

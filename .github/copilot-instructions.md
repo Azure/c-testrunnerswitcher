@@ -229,13 +229,14 @@ The library integrates with the standard Azure C library build system via `c-bui
 
 ### Core Dependencies
 For comprehensive coding standards and build patterns, refer to:
-- **c-build-tools Copilot Instructions** (#file:../deps/c-build-tools/.github/copilot-instructions.md) - Build infrastructure, quality gates, coding standards
+- **c-build-tools Copilot Instructions** (#file:../deps/c-build-tools/.github/copilot-instructions.md) - Build infrastructure, quality gates
+- **AI Context & Coding Standards** (#file:../deps/azure-messaging-ai-context/.github/copilot-instructions.md) - git conventions, terminal rules, agent skills
 - **ctest Copilot Instructions** (#file:../deps/ctest/.github/copilot-instructions.md) - C test framework patterns, assertion usage  
 - **c-logging Copilot Instructions** (#file:../deps/c-logging/.github/copilot-instructions.md) - Logging integration, error handling
 - **macro-utils-c Copilot Instructions** (#file:../deps/macro-utils-c/.github/copilot-instructions.md) - Macro metaprogramming patterns
 
 ### Build Standards Compliance
-**CRITICAL**: All code changes must strictly follow the comprehensive coding standards in #file:../deps/c-build-tools/.github/general_coding_instructions.md, including:
+**CRITICAL**: All code changes must strictly follow the comprehensive coding standards in #file:../deps/azure-messaging-ai-context/.github/general_coding_instructions.md, including:
 - Function naming conventions (snake_case with module prefixes)
 - Parameter validation patterns and error handling
 - Header inclusion order and memory management

@@ -19,4 +19,9 @@ extern "C" {
 
 BEGIN_TEST_SUITE(test_project_e2e)
 
+TEST_FUNCTION(a) // no-srs // no-aaa
+{
+
+}
+
 END_TEST_SUITE(test_project_e2e)

@@ -85,6 +85,8 @@ typedef void* TEST_MUTEX_HANDLE;
 #define RUN_TEST_SUITE(...)                         CTEST_RUN_TEST_SUITE(__VA_ARGS__)
 #define RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(...) CTEST_RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(__VA_ARGS__)
 
+#define PARAMETERIZED_TEST_FUNCTION                 CTEST_PARAMETERIZED_TEST_FUNCTION
+
 #define TEST_MUTEX_CREATE()             (TEST_MUTEX_HANDLE)1
 // the strlen check is simply to shut the compiler up and not create a hell of #pragma warning suppress
 #define TEST_MUTEX_ACQUIRE(mutex)       (strlen("a") == 0)
@@ -199,6 +201,23 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
 
 #define RUN_TEST_SUITE(...)
 #define RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(...)
+
+/* Parameterized tests for pure CPP_UNITTEST: wrappers using TEST_METHOD, reusing CTEST_PARAMETERIZED_TEST_ helpers from ctest.h */
+#define PARAMETERIZED_TEST_CALL_TEST_METHOD(funcName) TEST_METHOD(funcName)
+
+#define PARAMETERIZED_TEST_WRAPPER_IMPL(base_name, values, suffix) \
+    PARAMETERIZED_TEST_CALL_TEST_METHOD(MU_C3(base_name, _, suffix)) \
+    { \
+        MU_C2(base_name, _impl)(CTEST_PARAMETERIZED_TEST_STRIP_PARENS values); \
+    }
+
+#define PARAMETERIZED_TEST_WRAPPER_CALL(base_name, ...) PARAMETERIZED_TEST_WRAPPER_IMPL(base_name, __VA_ARGS__)
+#define PARAMETERIZED_TEST_WRAPPER(base_name, case_item) PARAMETERIZED_TEST_WRAPPER_CALL(base_name, MU_C2B(CTEST_PARAMETERIZED_TEST_EXPAND_CASE_, case_item))
+
+#define PARAMETERIZED_TEST_FUNCTION(base_name, args, ...) \
+    static void MU_C2(base_name, _impl)(CTEST_PARAMETERIZED_TEST_ARGS_DECL(args)); \
+    MU_FOR_EACH_1_KEEP_1(PARAMETERIZED_TEST_WRAPPER, base_name, __VA_ARGS__) \
+    static void MU_C2(base_name, _impl)(CTEST_PARAMETERIZED_TEST_ARGS_DECL(args))
 
 #define TEST_MUTEX_CREATE()                                 testmutex_create()
 #define TEST_MUTEX_ACQUIRE(mutex)                           testmutex_acquire(mutex)

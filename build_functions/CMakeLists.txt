@@ -328,7 +328,30 @@ function(build_exe whatIsBuilding solution_folder custom_main)
     #register the exe with ctest's list of tests
     #WORKING_DIRECTORY is set to the exe's output folder so that DbgHelp (SymInitialize)
     #can find PDB files when the test is run on a different agent than where it was built.
-    add_test(NAME ${whatIsBuilding} COMMAND ${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME} WORKING_DIRECTORY $<TARGET_FILE_DIR:${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}>)
+    #
+    #If TEST_LAUNCHER_COMMAND is set (typically by a consuming project's
+    #build_test_folder scoping), prepend it to the test command. This lets
+    #a consumer wrap tests with e.g. a per-test watchdog/timeout tool that
+    #captures a dump on hang. When wrapped, also set an explicit CTest
+    #TIMEOUT large enough to let the launcher run its own timeout+dump
+    #budget before CTest would otherwise preempt the wrapper.
+    if(DEFINED TEST_LAUNCHER_COMMAND AND TEST_LAUNCHER_COMMAND)
+        add_test(NAME ${whatIsBuilding}
+                 COMMAND ${TEST_LAUNCHER_COMMAND} $<TARGET_FILE:${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}>
+                 WORKING_DIRECTORY $<TARGET_FILE_DIR:${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}>)
+
+        if(NOT DEFINED TEST_LAUNCHER_TIMEOUT_SECONDS)
+            set(TEST_LAUNCHER_TIMEOUT_SECONDS 1200)
+        endif()
+        if(NOT DEFINED TEST_LAUNCHER_DUMP_TIMEOUT_SECONDS)
+            set(TEST_LAUNCHER_DUMP_TIMEOUT_SECONDS 180)
+        endif()
+        math(EXPR _ctest_timeout
+            "${TEST_LAUNCHER_TIMEOUT_SECONDS} + ${TEST_LAUNCHER_DUMP_TIMEOUT_SECONDS} + 60")
+        set_tests_properties(${whatIsBuilding} PROPERTIES TIMEOUT ${_ctest_timeout})
+    else()
+        add_test(NAME ${whatIsBuilding} COMMAND ${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME} WORKING_DIRECTORY $<TARGET_FILE_DIR:${whatIsBuilding}_exe_${CMAKE_PROJECT_NAME}>)
+    endif()
 
     if(UNIX) #LINUX OR APPLE
         if(${run_valgrind} OR ${run_helgrind} OR ${run_drd})
@@ -368,6 +391,20 @@ function(build_test_folder test_folder)
         set(multiValueArgs) #no multi value args
 
         cmake_parse_arguments("arg" "${options}" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) #"arg" is the prefix added to variables detected by cmake_parse_arguments
+
+        # Scope test wrapping (e.g. timeout watchdog) to integration tests only.
+        # The consuming project sets TEST_LAUNCHER_COMMAND_INT to a CMake list
+        # like "<watchdog_exe>;--timeout-seconds;1200;--dump-dir;<path>;--".
+        # Sub-trees can opt out (e.g. the watchdog's own self-tests) by setting
+        # TEST_LAUNCHER_DISABLED.
+        if(("${test_folder}" MATCHES ".*int.*")
+           AND DEFINED TEST_LAUNCHER_COMMAND_INT
+           AND TEST_LAUNCHER_COMMAND_INT
+           AND NOT TEST_LAUNCHER_DISABLED)
+            set(TEST_LAUNCHER_COMMAND ${TEST_LAUNCHER_COMMAND_INT})
+        else()
+            set(TEST_LAUNCHER_COMMAND "")
+        endif()
 
         set(building exe)
         add_subdirectory(${test_folder} ${test_folder}/${arg_BINARY_DIR}/${building})

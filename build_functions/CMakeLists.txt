@@ -449,3 +449,33 @@ function(build_test_artifacts_with_custom_main whatIsBuilding solution_folder )
         MESSAGE(FATAL_ERROR "not an expected value: building=${building} test_folder=${test_folder} ARGN=${ARGN}")
     endif()
 endfunction()
+
+#
+# set_test_watchdog_timeout: configure a per-test watchdog timeout for an
+# already-registered ctest test. Sets both the environment override
+# (TEST_WATCHDOG_TIMEOUT_SECONDS - applied by the watchdog) and the
+# matching CTest TIMEOUT property (so CTest does not preempt the
+# watchdog before dump capture completes).
+#
+# Usage (consuming repo, AFTER build_test_folder has registered the test):
+#   set_test_watchdog_timeout(my_int_test 600)
+#
+# This function is intended to be called from inside a test directory's
+# CMakeLists.txt right after build_test_artifacts. With use_cppunittest=ON,
+# build_test_folder processes the test directory twice (exe + dll passes);
+# only the exe pass actually registers a ctest test via add_test. Skip
+# silently on non-exe passes so set_property doesn't error out on a test
+# that exists only in the sibling binary-dir scope.
+function(set_test_watchdog_timeout test_name seconds)
+    if(DEFINED building AND NOT "${building}" STREQUAL "exe")
+        return()
+    endif()
+    if(NOT DEFINED TEST_LAUNCHER_DUMP_TIMEOUT_SECONDS)
+        set(TEST_LAUNCHER_DUMP_TIMEOUT_SECONDS 180)
+    endif()
+    set_property(TEST ${test_name} APPEND PROPERTY
+        ENVIRONMENT "TEST_WATCHDOG_TIMEOUT_SECONDS=${seconds}")
+    math(EXPR _twd_ctest_timeout
+        "${seconds} + ${TEST_LAUNCHER_DUMP_TIMEOUT_SECONDS} + 60")
+    set_property(TEST ${test_name} PROPERTY TIMEOUT ${_twd_ctest_timeout})
+endfunction()

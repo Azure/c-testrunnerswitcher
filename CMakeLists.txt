@@ -31,6 +31,18 @@ option(run_reals_check "set run_reals_check to ON to run reals check (default is
 option(use_installed_dependencies "set use_installed_dependencies to ON to use installed packages instead of building dependencies from submodules" OFF)
 option(use_cppunittest "set use_cppunittest to ON to build CppUnitTest tests on Windows (default is OFF)" OFF)
 
+# test_watchdog: per-test timeout watchdog with minidump capture.
+# When ON (default on Windows), build_exe routes each test via the
+# watchdog launcher, which captures a full-memory minidump if the test
+# exceeds its timeout before killing the process tree.
+# Consuming projects can override by setting use_test_watchdog OFF, or
+# scope the launcher per-folder via TEST_LAUNCHER_DISABLED.
+if(WIN32)
+    option(use_test_watchdog "Wrap integration tests with the test_watchdog launcher (default ON Windows)" ON)
+else()
+    option(use_test_watchdog "Wrap integration tests with the test_watchdog launcher (Windows only)" OFF)
+endif()
+
 #bring in dependencies
 #do not add or build any tests of the dependencies
 set(original_run_e2e_tests ${run_e2e_tests})
@@ -111,6 +123,15 @@ set_target_properties(testrunnerswitcher
                FOLDER "test_tools")
 
 add_subdirectory(build_functions)
+
+# Build the test_watchdog tool before test_projects so that build_exe's
+# launcher injection (when use_test_watchdog is ON) can resolve the
+# target's $<TARGET_FILE:test_watchdog>. Gated on WIN32 because dbghelp
+# is Windows-only.
+if(WIN32 AND ${use_test_watchdog})
+    add_subdirectory(tools/test_watchdog)
+endif()
+
 add_subdirectory(test_projects)
 
 if(${run_reals_check})

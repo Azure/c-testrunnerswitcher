@@ -119,6 +119,25 @@ TEST_DEFINE_ENUM_TYPE(MY_ENUM, VALUE1, VALUE2, VALUE3)
 TEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(MY_ENUM, VALUE1, VALUE2)
 ```
 
+#### Prefer the actual enum type when asserting enum values
+When asserting a value whose declared type is an enum, always pass the enum type as the first argument to
+`ASSERT_ARE_EQUAL`. Do not cast to `int` just to make the assert compile:
+
+```c
+// BAD - loses type information, no symbolic name on failure
+ASSERT_ARE_EQUAL(int, (int)MY_RESULT_OK, (int)result);
+
+// GOOD - prints the enum value names on failure
+ASSERT_ARE_EQUAL(MY_RESULT, MY_RESULT_OK, result);
+```
+
+Register the enum with the test framework using `TEST_DEFINE_ENUM_TYPE`:
+```c
+TEST_DEFINE_ENUM_TYPE(MY_RESULT, MY_RESULT_VALUES);
+```
+
+The enum-typed assert prints the symbolic name of both expected and actual values (e.g. `MY_RESULT_TIMED_OUT` instead of `1`), which is far more useful when diagnosing failures from CI logs.
+
 ### Test Execution (ctest mode only)
 ```c
 // Basic execution

@@ -131,11 +131,6 @@ ASSERT_ARE_EQUAL(int, (int)MY_RESULT_OK, (int)result);
 ASSERT_ARE_EQUAL(MY_RESULT, MY_RESULT_OK, result);
 ```
 
-Register the enum with the test framework using `TEST_DEFINE_ENUM_TYPE`:
-```c
-TEST_DEFINE_ENUM_TYPE(MY_RESULT, MY_RESULT_VALUES);
-```
-
 The enum-typed assert prints the symbolic name of both expected and actual values (e.g. `MY_RESULT_TIMED_OUT` instead of `1`), which is far more useful when diagnosing failures from CI logs.
 
 ### Test Execution (ctest mode only)

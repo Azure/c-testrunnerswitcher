@@ -257,6 +257,12 @@ END_TEST_SUITE(component_tests)
 
 // Leverage optional message formatting
 ASSERT_ARE_EQUAL(int, expected, actual, "Operation failed with code %d", error_code);
+
+// Register the enum with TEST_DEFINE_ENUM_TYPE and pass the enum type to
+// ASSERT_ARE_EQUAL so failures print symbolic names (e.g. MY_RESULT_TIMED_OUT
+// instead of 1) rather than raw integers
+TEST_DEFINE_ENUM_TYPE(MY_RESULT, MY_RESULT_VALUES);
+ASSERT_ARE_EQUAL(MY_RESULT, MY_RESULT_OK, result);
 ```
 
 ### ❌ Anti-Patterns to Avoid
@@ -271,6 +277,12 @@ ASSERT_ARE_EQUAL(int, expected, actual, "Operation failed with code %d", error_c
 
 // Don't mix framework calls in hybrid mode
 RUN_TEST_SUITE(MySuite);  // Wrong in CppUnitTest - this is ctest-only
+
+// When ASSERT_ARE_EQUAL on an enum doesn't compile, don't fall back to
+// casting to int - that hides the real fix, which is to register the enum
+// with TEST_DEFINE_ENUM_TYPE and assert with the enum type. Casting to int
+// loses type information and prints raw integers on failure
+ASSERT_ARE_EQUAL(int, (int)MY_RESULT_OK, (int)result);  // Wrong - register the enum and assert with its type
 ```
 
 The test runner switcher's primary value is enabling identical test code to work across different execution environments while maintaining the specific advantages of each framework.

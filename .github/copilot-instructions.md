@@ -123,9 +123,6 @@ TEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(MY_ENUM, VALUE1, VALUE2)
 ```c
 // Basic execution
 RUN_TEST_SUITE(MySuite);
-
-// With memory leak detection retries
-RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(MySuite);
 ```
 
 ### Thread Synchronization (CppUnitTest)

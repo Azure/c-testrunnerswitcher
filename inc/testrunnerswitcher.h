@@ -66,7 +66,6 @@ typedef void* TEST_MUTEX_HANDLE;
 #define ASSERT_IS_FALSE                 CTEST_ASSERT_IS_FALSE
 
 #define RUN_TEST_SUITE(...)                         CTEST_RUN_TEST_SUITE(__VA_ARGS__)
-#define RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(...) CTEST_RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(__VA_ARGS__)
 
 #define PARAMETERIZED_TEST_FUNCTION                 CTEST_PARAMETERIZED_TEST_FUNCTION
 
@@ -183,7 +182,6 @@ extern "C" void CPPUNITTEST_SYMBOL(void) {}
     } while ((void)0, 0)
 
 #define RUN_TEST_SUITE(...)
-#define RUN_TEST_SUITE_WITH_LEAK_CHECK_RETRIES(...)
 
 /* Parameterized tests for pure CPP_UNITTEST: wrappers using TEST_METHOD, reusing CTEST_PARAMETERIZED_TEST_ helpers from ctest.h */
 #define PARAMETERIZED_TEST_CALL_TEST_METHOD(funcName) TEST_METHOD(funcName)

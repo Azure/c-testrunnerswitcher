@@ -357,10 +357,10 @@ endfunction()
 function(build_test_folder test_folder)
 
     if(
-        (("${test_folder}" MATCHES ".*ut.*") AND ${run_unittests}) OR
-        (("${test_folder}" MATCHES ".*e2e.*") AND ${run_e2e_tests}) OR
-        (("${test_folder}" MATCHES ".*int.*") AND ${run_int_tests}) OR
-        (("${test_folder}" MATCHES ".*perf.*") AND ${run_perf_tests})
+        (("${test_folder}" MATCHES ".*ut.*") AND run_unittests) OR
+        (("${test_folder}" MATCHES ".*e2e.*") AND run_e2e_tests) OR
+        (("${test_folder}" MATCHES ".*int.*") AND run_int_tests) OR
+        (("${test_folder}" MATCHES ".*perf.*") AND run_perf_tests)
     )
 
         set(options) #there are no options

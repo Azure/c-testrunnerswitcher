@@ -23,6 +23,9 @@ typedef void* TEST_MUTEX_HANDLE;
 // a macro useful for disabling tests while debugging
 #define DISABLED_TEST_FUNCTION(name)    void name(void)
 
+// a macro useful for disabling parameterized tests while debugging (the PARAMETERIZED_TEST_FUNCTION counterpart of DISABLED_TEST_FUNCTION).
+#define DISABLED_PARAMETERIZED_TEST_FUNCTION(base_name, args, ...)    void MU_C2(base_name, _impl)(CTEST_PARAMETERIZED_TEST_ARGS_DECL(args))
+
 #ifdef USE_CTEST
 
 #define TEST_DEFINE_ENUM_TYPE(type, ...) CTEST_DEFINE_ENUM_TYPE(type, __VA_ARGS__)

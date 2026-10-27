@@ -1,8 +1,7 @@
 name: Two human reviewers
-# Calls the shared gate in c-build-tools. Keep `pull_request_review`, or approvals never re-run it. A
-# fork's PR gets a read-only token (`pull_request_target` is blocked by default), so a maintainer
-# publishes its status with "Run workflow" or the command below, again after each push or review.
-# Never add a checkout.
+# TEST ONLY. Runs the gate pinned by the target branch's deps/c-build-tools, so propagation never edits this file and
+# a pull request never selects the gate that judges it. Keep `pull_request_review`, or approvals never re-run it.
+# Never check out PR code.
 #   gh workflow run two-human-reviewers.yml -R <owner>/<repo> -f pr=<number>
 
 on:
@@ -17,7 +16,6 @@ on:
   pull_request_review:
     types: [submitted, dismissed]
 
-# Set here because a called workflow can never hold more permission than its caller.
 permissions:
   contents: read
   pull-requests: read
@@ -25,8 +23,27 @@ permissions:
 
 jobs:
   two-human-reviewers:
-    # Pin to a tag or commit SHA instead of a branch if you need the gate's behaviour to change only when
-    # you choose to update it.
-    uses: Azure/c-build-tools/.github/workflows/two-human-reviewers.yml@e5ade18fce434f142d4e88060f0b893217e44ec1
-    with:
-      pr: ${{ github.event.pull_request.number || inputs.pr }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch the gate pinned by the target branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number || inputs.pr }}
+        run: |
+          set -euo pipefail
+          # The target branch's current pointer, never the PR's own: a PR must not choose its gate.
+          base_ref=$(gh api "repos/$REPO/pulls/$PR" --jq .base.ref)
+          gate_sha=$(gh api -X GET "repos/$REPO/contents/deps/c-build-tools" -f ref="$base_ref" \
+            --jq 'select(.type == "submodule") | .sha')
+          if ! [[ "$gate_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::deps/c-build-tools on $base_ref is not a submodule."
+            exit 1
+          fi
+          mkdir -p .gate
+          gh api -X GET "repos/Azure/c-build-tools/contents/.github/actions/two-human-reviewers/action.yml" \
+            -f ref="$gate_sha" -H "Accept: application/vnd.github.raw+json" > .gate/action.yml
+          echo "::notice::Gate from Azure/c-build-tools $gate_sha, pinned by $base_ref."
+      - uses: ./.gate
+        with:
+          pr: ${{ github.event.pull_request.number || inputs.pr }}

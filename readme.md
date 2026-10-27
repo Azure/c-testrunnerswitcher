@@ -39,3 +39,4 @@ Optionally, you may choose to install testrunnerswitcher on your machine:
     find_package(testrunnerswitcher REQUIRED CONFIG)
     target_link_library(yourlib testrunnerswitcher)
     ```
+<!-- gate test A: trivial change -->

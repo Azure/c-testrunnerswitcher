@@ -30,6 +30,9 @@ typedef void* TEST_MUTEX_HANDLE;
 
 #define TEST_DEFINE_ENUM_TYPE(type, ...) CTEST_DEFINE_ENUM_TYPE(type, __VA_ARGS__)
 #define TEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type, ...) CTEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(type, __VA_ARGS__)
+#ifdef __cplusplus
+#define TEST_DEFINE_ENUM_CLASS_TYPE(type, ...) CTEST_DEFINE_ENUM_CLASS_TYPE(type, __VA_ARGS__)
+#endif
 
 // if both are defined do not forget to include the ctest to cpp unit test
 #ifdef CPP_UNITTEST

@@ -117,6 +117,10 @@ ASSERT_FAIL(message_format, ...)
 // Custom type support
 TEST_DEFINE_ENUM_TYPE(MY_ENUM, VALUE1, VALUE2, VALUE3)
 TEST_DEFINE_ENUM_TYPE_WITHOUT_INVALID(MY_ENUM, VALUE1, VALUE2)
+
+// Existing C++ enum such as an SDK enum class (C++ only, ctest mode): alias + bare enumerator names
+using SDK_RESULT = sdk::Result;
+TEST_DEFINE_ENUM_CLASS_TYPE(SDK_RESULT, kSuccess, kFailure)
 ```
 
 ### Test Execution (ctest mode only)
